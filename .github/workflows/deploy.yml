@@ -1,0 +1,44 @@
+# Build the Astro site and publish it to GitHub Pages.
+# Repo layout: this file assumes the Astro project (package.json) is at the REPOSITORY ROOT.
+# If you instead keep the site in a subfolder, set `path:` on the withastro/action step below.
+name: Deploy site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Least privilege needed to deploy to Pages via OIDC.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time; don't cancel an in-flight production deploy.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install, build & upload the Astro site
+        uses: withastro/action@v3
+        with:
+          node-version: 22
+          package-manager: npm
+          # path: .   # root of the Astro project (uncomment & set if in a subfolder)
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
