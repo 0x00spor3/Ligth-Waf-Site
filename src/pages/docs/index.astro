@@ -1,0 +1,48 @@
+---
+// SPDX-FileCopyrightText: 2026 0x00spor3
+// SPDX-License-Identifier: BUSL-1.1
+import DocsLayout from "../../layouts/DocsLayout.astro";
+import { CORE_REPO, CRATES, CONTACT_MAILTO, RELEASES } from "../../consts";
+---
+
+<DocsLayout title="Documentation" description="Documentation for the Light WAF open core (Apache-2.0): quickstart, configuration reference, and the detection module catalogue.">
+  <h1>Documentation</h1>
+  <p class="lede">
+    Everything you need to run and configure the <strong>open core</strong> — the standalone,
+    Apache-2.0 WAF. The enterprise control plane has its own operator guide, available to customers.
+  </p>
+
+  <h2>Start here</h2>
+  <ul>
+    <li><a href="/docs/quickstart">Quickstart</a> — install the <code>waf</code> binary, point it at your backend, and see it block.</li>
+    <li><a href="/docs/configuration">Configuration</a> — the full config file, section by section.</li>
+    <li><a href="/docs/modules">Detection modules</a> — what each module catches, and how requests are scored.</li>
+  </ul>
+
+  <h2>Crate reference</h2>
+  <p>The core is published to crates.io; API docs are on docs.rs.</p>
+  <div class="map">
+    <table>
+      <thead>
+        <tr><th>Crate</th><th>What it is</th><th>Links</th></tr>
+      </thead>
+      <tbody>
+        {CRATES.map((c) => (
+          <tr>
+            <td class="area">{c.name}</td>
+            <td class="open">{c.blurb}</td>
+            <td><a href={`https://docs.rs/${c.name}`}>docs.rs</a> · <a href={c.url}>crates.io</a></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <p style="margin-top:1rem"><a href={CORE_REPO}>Browse the source on GitHub →</a> · <a href={RELEASES}>Release history →</a></p>
+
+  <div class="callout">
+    <p><strong>Running the enterprise tier?</strong> The control plane, governed rule management, RBAC/SSO, compliance and SIEM export ship with a dedicated operator guide, available to customers under the commercial licence.</p>
+    <p class="mnemonic" style="border:none;padding:0;margin-top:.6rem;font-style:normal">
+      <a href={CONTACT_MAILTO}>Request enterprise access →</a>
+    </p>
+  </div>
+</DocsLayout>

@@ -1,0 +1,219 @@
+---
+// SPDX-FileCopyrightText: 2026 0x00spor3
+// SPDX-License-Identifier: BUSL-1.1
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+import Meter from "../components/Meter.astro";
+import { CORE_REPO } from "../consts";
+
+const protect = [
+  { t: "Detection pipeline", d: "SQLi, XSS, RCE, path traversal, SSRF, LDAP/NoSQL/SSTI and more — plus the CRS rule engine — score every request cooperatively." },
+  { t: "Cluster-wide rate limiting", d: "One token-bucket budget shared across every node via Redis, with atomic server-side accounting. No node over-allows." },
+  { t: "IP reputation & threat feeds", d: "Score client IPs from your bl&#8203;ocklists; a single-writer feed keeps the shared reputation fresh and self-expiring." },
+  { t: "Managed TLS", d: "Hitless ACME certificates (TLS-ALPN-01 or DNS-01 wildcards), plus mutual-TLS client auth. Fail-closed, never a silent downgrade." },
+  { t: "Schema enforcement", d: "Validate every GraphQL and gRPC operation against your app's real schema — a field the real client never sends is a probing signal." },
+  { t: "Signed WASM plugins", d: "Extend detection with your own WASM modules, gated by a detached minisign signature. A plugin that fails verification never loads." },
+];
+const operate = [
+  { t: "Control-plane dashboard", d: "A single pane over the whole cluster: block rate, traffic disposition, denied-event volume and per-node latency." },
+  { t: "Verdict drill-down", d: "Open any blocked request and see the accumulated score broken down per rule and severity — exactly why it was stopped." },
+  { t: "Alerting", d: "Fire on per-IP or per-rule bursts within a window, with cooldowns, and push to a webhook. Attack signatures surface themselves." },
+  { t: "Governed rule management", d: "Publish and roll back ruleset versions from the dashboard; a per-node agent validates and hot-reloads, and you watch convergence." },
+];
+const govern = [
+  { t: "RBAC & SSO", d: "Viewer / operator / admin roles, local accounts, and OpenID Connect single sign-on backed by HttpOnly session cookies." },
+  { t: "Signed audit log", d: "Every action is written to a hash-chained, Ed25519-signed log — tamper-evident and verifiable on demand." },
+  { t: "Compliance evidence", d: "Generate a signed SOC2 / PCI evidence bundle for any period — access control, audit integrity, WAF effectiveness, incidents." },
+  { t: "SIEM export", d: "Push denied verdicts, audit records and alerts to your SIEM as versioned ECS-like NDJSON, at-least-once, with visible lag." },
+];
+---
+
+<Base>
+  <Nav />
+
+  <!-- Hero — the thesis: the Verdict Meter crossing the threshold. -->
+  <header class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="eyebrow">Web Application Firewall</span>
+        <h1>Risk accumulates.<br />The <span class="accent">threshold</span> decides.</h1>
+        <p class="lede">
+          Light WAF inspects every request, scores it against your rules, and blocks when the score
+          crosses the line — with a control panel that shows you exactly why.
+        </p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="#features">See what it does</a>
+          <a class="btn btn-ghost" href={CORE_REPO}>Explore the open core</a>
+        </div>
+        <div class="hero-meta">
+          <span><i></i>Open core (Apache-2.0)</span>
+          <span class="mono">Rust · zero-fork extension</span>
+        </div>
+      </div>
+      <Meter />
+    </div>
+  </header>
+
+  <!-- The model -->
+  <section id="model">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">How it decides</span>
+        <h2>No single rule blocks a request. The score does.</h2>
+        <p>
+          Every module that matches contributes points by severity. When the cumulative anomaly score
+          crosses your block threshold, the request is denied. Tuning the WAF is tuning that one
+          relationship — not editing rules by hand.
+        </p>
+      </div>
+      <div class="model">
+        <div class="model-step reveal">
+          <span class="num">01 · INSPECT</span>
+          <h3>Every phase, every request</h3>
+          <p>Connection, headers, body — native detectors and CRS rules examine each request as it's read, in order.</p>
+        </div>
+        <div class="model-step reveal" style="animation-delay:.08s">
+          <span class="num">02 · SCORE</span>
+          <h3>Severity becomes points</h3>
+          <p>A critical adds 6, a warning 3, a notice 2. Two weak signals together weigh as much as one strong one.</p>
+        </div>
+        <div class="model-step reveal" style="animation-delay:.16s">
+          <span class="num">03 · DECIDE</span>
+          <h3>Cross the line, get blocked</h3>
+          <p>At the threshold the verdict flips to blocked — and the full breakdown is stored for the drill-down.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Capabilities</span>
+        <h2>A firewall, an operations console, and a governance layer.</h2>
+        <p>Everything below the core is opt-in and default-off — turn it all off and you have exactly the standalone OPEN WAF.</p>
+      </div>
+
+      <div class="feature-group">
+        <span class="fg-label">Protect — the data path</span>
+        <div class="feature-grid">
+          {protect.map((f) => (
+            <div class="feature">
+              <div class="fi"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2fe0c0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/></svg></div>
+              <h3>{f.t}</h3>
+              <p set:html={f.d}></p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="feature-group">
+        <span class="fg-label">Operate — the control panel</span>
+        <div class="feature-grid">
+          {operate.map((f) => (
+            <div class="feature">
+              <div class="fi"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2fe0c0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3 7 4-14 3 7h4"/></svg></div>
+              <h3>{f.t}</h3>
+              <p>{f.d}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="feature-group">
+        <span class="fg-label">Govern — access & evidence</span>
+        <div class="feature-grid">
+          {govern.map((f) => (
+            <div class="feature">
+              <div class="fi"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2fe0c0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+              <h3>{f.t}</h3>
+              <p>{f.d}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dashboard showcase -->
+  <section id="dashboard">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">The control panel</span>
+        <h2>See what your WAF is doing — and why.</h2>
+        <p>A React dashboard over the whole cluster: monitor traffic, drill into any blocked request, manage rules, and produce compliance evidence.</p>
+      </div>
+      <div class="showcase">
+        <div class="shot wide">
+          <div class="shot-bar"><i></i><i></i><i></i><span>overview</span></div>
+          <img src="/shots/overview.png" alt="Light WAF dashboard — overview with block rate, traffic disposition and latency" loading="lazy" />
+          <div class="shot-cap"><b>Overview.</b> Block rate, traffic disposition, denied-event volume and per-node latency at a glance.</div>
+        </div>
+        <div class="shot">
+          <div class="shot-bar"><i></i><i></i><i></i><span>event drill-down</span></div>
+          <img src="/shots/event-detail.png" alt="Light WAF event drill-down with the Verdict Meter and score breakdown" loading="lazy" />
+          <div class="shot-cap"><b>Verdict drill-down.</b> The accumulated score, broken down per rule and severity.</div>
+        </div>
+        <div class="shot">
+          <div class="shot-bar"><i></i><i></i><i></i><span>compliance</span></div>
+          <img src="/shots/compliance.png" alt="Light WAF compliance report — signed SOC2/PCI evidence bundle" loading="lazy" />
+          <div class="shot-cap"><b>Compliance.</b> A signed SOC2 / PCI evidence bundle, generated for any period.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Editions -->
+  <section id="editions">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Editions</span>
+        <h2>An open core, extended without forking it.</h2>
+        <p>The enterprise tier plugs into the core's extension seams through the builder — the same physical shape as a separate repository.</p>
+      </div>
+      <div class="compare">
+        <div class="edition">
+          <span class="tag">Apache-2.0 · public</span>
+          <h3>OPEN core</h3>
+          <p>A complete, standalone WAF — on GitHub and crates.io.</p>
+          <ul>
+            <li>Reverse proxy + detection pipeline</li>
+            <li>Native rule modules + CRS engine</li>
+            <li>TLS termination from file</li>
+            <li>Single-node rate limiting</li>
+            <li>Prometheus metrics + decision log</li>
+          </ul>
+        </div>
+        <div class="edition ent">
+          <span class="tag">BSL 1.1 · commercial</span>
+          <h3>Enterprise tier</h3>
+          <p>At-scale and governed capabilities on top — available commercially.</p>
+          <ul>
+            <li>Cluster-wide rate limit + IP reputation</li>
+            <li>Managed ACME TLS + curated premium rules</li>
+            <li>GraphQL/gRPC schema enforcement, bot detection</li>
+            <li>control panel, dashboard & governed rule management</li>
+            <li>RBAC/SSO, signed audit, compliance & SIEM export</li>
+          </ul>
+        </div>
+      </div>
+      <a class="seealso" href="/boundary">Where the line is — the full map &amp; the rules that hold it →</a>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="wrap">
+      <h2>Run it, tune the threshold, watch the verdicts.</h2>
+      <p>The open core is on GitHub and crates.io. The enterprise tier — control panel, governance, compliance, SIEM — is available commercially.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href={CORE_REPO}>Explore the open core</a>
+        <a class="btn btn-ghost" href="#dashboard">See the dashboard</a>
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+</Base>

@@ -1,0 +1,20 @@
+---
+// SPDX-FileCopyrightText: 2026 0x00spor3
+// SPDX-License-Identifier: BUSL-1.1
+import BrandMark from "./BrandMark.astro";
+import { CORE_REPO, RELEASES } from "../consts";
+---
+
+<footer>
+  <div class="wrap foot-inner">
+    <span class="brand"><BrandMark size={18} /> Light<b>WAF</b></span>
+    <span class="mono">Open core (Apache-2.0) · Enterprise (BSL 1.1)</span>
+    <div class="foot-links">
+      <a href="/core">Core</a>
+      <a href="/enterprise">Enterprise</a>
+      <a href="/boundary">Where the line is</a>
+      <a href={RELEASES}>Changelog</a>
+      <a href={CORE_REPO}>Core on GitHub</a>
+    </div>
+  </div>
+</footer>

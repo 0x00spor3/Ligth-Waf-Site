@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Light WAF mark: the Verdict Meter — allowed / threshold / blocked, on a dark tile. -->
+  <rect width="32" height="32" rx="7" fill="#0a0c12"/>
+  <rect x="3" y="13" width="26" height="6" rx="3" fill="#11141c" stroke="#232a38"/>
+  <rect x="4.5" y="14.5" width="9" height="3" rx="1.5" fill="#2fce8e"/>
+  <rect x="14.2" y="14.5" width="3.6" height="3" rx="1.5" fill="#2fe0c0"/>
+  <rect x="18.5" y="14.5" width="9" height="3" rx="1.5" fill="#fb5468"/>
+  <rect x="16.9" y="9.5" width="1.8" height="13" rx="0.9" fill="#2fe0c0"/>
+</svg>

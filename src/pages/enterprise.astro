@@ -1,0 +1,200 @@
+---
+// SPDX-FileCopyrightText: 2026 0x00spor3
+// SPDX-License-Identifier: BUSL-1.1
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+import { CONTACT_MAILTO, CONTACT_EMAIL } from "../consts";
+
+const pillars = [
+  { k: "Scale", t: "Protection across a fleet", d: "The core protects one node; the enterprise data-path modules coordinate across the whole cluster — one rate-limit budget, shared reputation, managed certificates." },
+  { k: "Operate", t: "One console over everything", d: "A control plane collects every node's telemetry, shows what's blocked and why, alerts on attack signatures, and manages rules with per-node convergence." },
+  { k: "Govern", t: "Access, audit, evidence", d: "RBAC and SSO, a signed tamper-evident audit log, on-demand SOC2/PCI evidence, and a SIEM feed — the paperwork a security program needs." },
+];
+
+const scale = [
+  { t: "Cluster-wide rate limiting", d: "One token-bucket budget shared across every node via Redis, accounted atomically server-side. No node over-allows." },
+  { t: "IP reputation & threat feeds", d: "Score client IPs from your blocklists; a single-writer feed keeps the shared, self-expiring reputation fresh across the fleet." },
+  { t: "Managed ACME TLS", d: "Hitless certificate issuance and rotation (TLS-ALPN-01 or DNS-01 wildcards), coordinated across nodes so one issues for the cluster." },
+  { t: "Curated premium rules", d: "A maintained pack of high-signal content — Log4Shell, Spring4Shell, cloud-metadata SSRF, CISA-KEV CVEs — on top of the CRS engine." },
+  { t: "Schema enforcement", d: "Validate every GraphQL and gRPC operation against your app's real schema; a field the real client never sends is a probing signal." },
+  { t: "Signed WASM plugins", d: "Extend detection with your own WASM modules, gated by a detached signature. A plugin that fails verification never loads." },
+];
+
+const govern = [
+  { t: "RBAC & SSO", d: "Viewer / operator / admin roles, local accounts, and OpenID Connect single sign-on behind HttpOnly session cookies." },
+  { t: "Signed audit log", d: "Every action hash-chained and Ed25519-signed — tamper-evident, and verifiable on demand from the dashboard." },
+  { t: "Compliance evidence", d: "Generate a signed SOC2 / PCI evidence bundle for any period: access control, audit integrity, WAF effectiveness, incidents." },
+  { t: "SIEM export", d: "Push denied verdicts, audit records and alerts to your SIEM as versioned ECS-like NDJSON — at-least-once, with visible lag." },
+];
+
+const trust = [
+  { t: "Zero-datapath control plane", d: "The control plane never sits between clients and your backend. It reads telemetry — it cannot add latency or fail a request." },
+  { t: "Zero-core, zero-fork", d: "Every capability plugs into the core's typed extension seams through the builder. The open core is used unmodified, by version." },
+  { t: "Pure-Rust, no C", d: "The same memory-safe, dependency-light foundation as the core — no C libraries dragged into the trust boundary." },
+  { t: "Self-hosted", d: "Runs on your infrastructure — your Postgres, your Redis, your network. Nothing phones home; your traffic stays with you." },
+];
+---
+
+<Base
+  title="Light WAF Enterprise — operate & govern the WAF at scale"
+  description="The commercial tier: a control plane, dashboard, governed rule management, RBAC/SSO, signed audit, SOC2/PCI compliance evidence, and SIEM export — on top of the open core, self-hosted."
+>
+  <Nav />
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="eyebrow">Enterprise tier · BSL 1.1 · commercial</span>
+        <h1>From a firewall to a <span class="accent">security program</span>.</h1>
+        <p class="lede">
+          A control plane, governed rule management, compliance evidence and SIEM export — layered on
+          the open core through its extension seams, without forking it. Self-hosted, off the request
+          path.
+        </p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href={CONTACT_MAILTO}>Request access</a>
+          <a class="btn btn-ghost" href="#controlplane">See the control plane</a>
+        </div>
+        <div class="hero-meta">
+          <span><i></i>Self-hosted · your infrastructure</span>
+          <span class="mono">Zero-datapath control plane</span>
+        </div>
+      </div>
+      <div class="shot reveal">
+        <div class="shot-bar"><i></i><i></i><i></i><span>control plane · overview</span></div>
+        <img src="/shots/overview.png" alt="Light WAF control plane — overview dashboard" loading="eager" />
+      </div>
+    </div>
+  </header>
+
+  <!-- Pillars -->
+  <section id="pillars">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">What the tier adds</span>
+        <h2>The core protects a node. This runs the fleet.</h2>
+        <p>Three things change when you move from a standalone WAF to a governed deployment across many nodes.</p>
+      </div>
+      <div class="model">
+        {pillars.map((p) => (
+          <div class="model-step">
+            <span class="num">{p.k.toUpperCase()}</span>
+            <h3>{p.t}</h3>
+            <p>{p.d}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- At-scale protection -->
+  <section id="protect">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">At-scale protection</span>
+        <h2>Coordinated defense on the data path.</h2>
+        <p>Enterprise detection modules plug into the core's seams, survive reloads, and act across the whole cluster — never a fork.</p>
+      </div>
+      <div class="feature-grid">
+        {scale.map((f) => (
+          <div class="feature">
+            <h3>{f.t}</h3>
+            <p>{f.d}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Control plane showcase -->
+  <section id="controlplane">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">The control plane</span>
+        <h2>See what your fleet is doing — and why.</h2>
+        <p>A separate service, off the request path, that turns every node's telemetry into one operational picture.</p>
+      </div>
+      <div class="showcase">
+        <div class="shot wide">
+          <div class="shot-bar"><i></i><i></i><i></i><span>overview</span></div>
+          <img src="/shots/overview.png" alt="Overview — block rate, traffic disposition, latency" loading="lazy" />
+          <div class="shot-cap"><b>Monitor.</b> Block rate, traffic disposition, denied-event volume and per-node latency across the cluster.</div>
+        </div>
+        <div class="shot">
+          <div class="shot-bar"><i></i><i></i><i></i><span>event drill-down</span></div>
+          <img src="/shots/event-detail.png" alt="Event drill-down — the Verdict Meter and score breakdown" loading="lazy" />
+          <div class="shot-cap"><b>Explain.</b> Open any blocked request and see the score, broken down per rule and severity.</div>
+        </div>
+        <div class="shot">
+          <div class="shot-bar"><i></i><i></i><i></i><span>rules</span></div>
+          <img src="/shots/rules.png" alt="Rule management — versions, rollback, per-node convergence" loading="lazy" />
+          <div class="shot-cap"><b>Manage.</b> Publish and roll back ruleset versions; an agent validates and hot-reloads, and you watch convergence.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Govern & prove -->
+  <section id="govern">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Govern &amp; prove</span>
+        <h2>Access control, and the evidence to back it.</h2>
+        <p>Who can do what, a record that can't be quietly altered, and the reports your auditors ask for.</p>
+      </div>
+      <div class="feature-grid">
+        {govern.map((f) => (
+          <div class="feature">
+            <h3>{f.t}</h3>
+            <p>{f.d}</p>
+          </div>
+        ))}
+      </div>
+      <div class="shot wide" style="margin-top:1.5rem">
+        <div class="shot-bar"><i></i><i></i><i></i><span>compliance</span></div>
+        <img src="/shots/compliance.png" alt="Compliance report — a signed SOC2/PCI evidence bundle" loading="lazy" />
+        <div class="shot-cap"><b>Compliance.</b> A signed SOC2 / PCI evidence bundle, generated for any period and verifiable independently.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Architecture & trust -->
+  <section id="trust">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Architecture &amp; trust</span>
+        <h2>Built to sit in a security boundary.</h2>
+        <p>The properties that matter when you put a vendor in front of your traffic.</p>
+      </div>
+      <div class="feature-grid">
+        {trust.map((f) => (
+          <div class="feature">
+            <h3>{f.t}</h3>
+            <p>{f.d}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Get access -->
+  <section class="cta" id="contact">
+    <div class="wrap">
+      <span class="eyebrow">Get access</span>
+      <h2>Bring it to your infrastructure.</h2>
+      <p>
+        The enterprise tier is commercial, source-available to customers under BSL 1.1. Tell us about
+        your deployment and we'll get you set up.
+      </p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href={CONTACT_MAILTO}>Request access</a>
+        <a class="btn btn-ghost" href="/core">Start with the open core</a>
+      </div>
+      <p class="mono" style="margin-top:1.4rem;color:var(--ink-faint);font-size:.82rem">{CONTACT_EMAIL}</p>
+    </div>
+  </section>
+
+  <Footer />
+</Base>

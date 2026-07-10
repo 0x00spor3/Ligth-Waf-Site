@@ -1,0 +1,19 @@
+{
+  "name": "lightwaf-site",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Marketing landing site for Light WAF.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
+    "@fontsource-variable/space-grotesk": "^5.2.10",
+    "@fontsource/ibm-plex-mono": "^5.2.7",
+    "@fontsource/ibm-plex-sans": "^5.2.8",
+    "astro": "^7.0.7"
+  }
+}

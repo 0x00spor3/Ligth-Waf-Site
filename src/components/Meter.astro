@@ -1,0 +1,59 @@
+---
+// SPDX-FileCopyrightText: 2026 0x00spor3
+// SPDX-License-Identifier: BUSL-1.1
+// The signature hero visual: a live Verdict Meter. Per-rule contributions grow in as stacked
+// severity-colored segments and cross the block threshold, tipping the request to "blocked" — the
+// product's whole model in one animation.
+const segments = [
+  { w: 30, color: "#fb5468", delay: 0.3 }, // critical
+  { w: 24, color: "#fb5468", delay: 0.6 }, // critical
+  { w: 14, color: "#ff9d42", delay: 0.9 }, // warning
+  { w: 10, color: "#5b9dff", delay: 1.2 }, // notice
+];
+---
+
+<div class="meter-card reveal">
+  <div class="mc-head">
+    <span class="mc-req">req-7f3a9c21 · POST /api/login</span>
+    <span class="mc-verdict">▲ blocked</span>
+  </div>
+  <div class="mc-score"><span data-count="12">0</span><small>accumulated score</small></div>
+  <div class="mc-track">
+    {
+      segments.map((s) => (
+        <span
+          class="mc-seg"
+          style={`--w:${s.w}%; background:${s.color}; animation-delay:${s.delay}s;`}
+        />
+      ))
+    }
+    <span class="mc-threshold"></span>
+  </div>
+  <div class="mc-legend">
+    <span><i style="background:#fb5468"></i>critical</span>
+    <span><i style="background:#ff9d42"></i>warning</span>
+    <span><i style="background:#5b9dff"></i>notice</span>
+  </div>
+</div>
+
+<script>
+  // Progressive enhancement: count the score up once. Without JS the value is already shown as "0"
+  // then set to final on load; with reduced-motion we jump straight to the target.
+  const el = document.querySelector<HTMLElement>("[data-count]");
+  if (el) {
+    const target = Number(el.dataset.count) || 0;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      el.textContent = String(target);
+    } else {
+      const start = performance.now();
+      const dur = 1600;
+      const tick = (t: number) => {
+        const p = Math.min((t - start) / dur, 1);
+        el.textContent = String(Math.round(p * target));
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+  }
+</script>

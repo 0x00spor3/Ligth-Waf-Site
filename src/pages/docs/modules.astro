@@ -1,0 +1,66 @@
+---
+// SPDX-FileCopyrightText: 2026 0x00spor3
+// SPDX-License-Identifier: BUSL-1.1
+import DocsLayout from "../../layouts/DocsLayout.astro";
+
+const modules = [
+  ["sqli", "SQL injection"],
+  ["xss", "Cross-site scripting"],
+  ["rce", "Remote command / OS-command injection"],
+  ["path_traversal", "Directory traversal (../ and encodings)"],
+  ["lfi_rfi", "Local & remote file inclusion"],
+  ["ssrf", "Server-side request forgery, incl. cloud-metadata"],
+  ["ldap", "LDAP injection"],
+  ["nosql", "NoSQL / query-operator injection"],
+  ["ssti", "Server-side template injection"],
+  ["ssi", "Server-side includes injection"],
+  ["xxe", "XML external entity"],
+  ["mail", "Mail-header injection"],
+  ["scanner", "Scanner / tool fingerprint (User-Agent)"],
+  ["header_injection", "CRLF / response-splitting"],
+  ["request_smuggling", "HTTP request smuggling (CL/TE)"],
+];
+---
+
+<DocsLayout title="Detection modules" description="The Light WAF open-core detection module catalogue: what each module catches, how phased inspection and anomaly scoring work, anti-evasion normalization, and importing CRS rules.">
+  <h1>Detection modules</h1>
+  <p class="lede">Modules run in phases as a request is read, and each contributes to one cumulative anomaly score. No module blocks on its own unless its score is worth it.</p>
+
+  <h2>How inspection works</h2>
+  <p>Detection is phased — <code>connection → headers → body</code> — and cooperative: every matched rule adds points by severity to the request's score, and the request is denied when the score crosses <code>block_threshold</code>. Verdicts are <strong>allow</strong> (forwarded), <strong>block</strong> (403), or <strong>reject</strong> (400 / 429 on a structural violation). See <a href="/docs/configuration">scoring configuration</a>.</p>
+
+  <h2>The catalogue</h2>
+  <div class="map">
+    <table>
+      <thead>
+        <tr><th>Module</th><th>Catches</th></tr>
+      </thead>
+      <tbody>
+        {modules.map(([id, what]) => (
+          <tr>
+            <td class="area"><code>{id}</code></td>
+            <td class="open">{what}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <p>Each is enabled under its own <code>[modules.&lt;name&gt;]</code> table (all on by default in the sample config).</p>
+
+  <h2>Anti-evasion normalization</h2>
+  <p>Before a rule ever runs, input is folded into a canonical form so encoded attacks can't slip past: double-encoding-aware percent-decoding, Unicode NFKC, and a pipeline-wide overlong-collapse. A derived <em>decode-then-match-then-discard</em> channel also covers base64, HTML entities, tag/control stripping and VBScript concatenation, across multipart, JSON leaves and cookies.</p>
+
+  <h2>Structural protocol validation</h2>
+  <p>GraphQL and gRPC operations are validated on their <em>shape</em> — query depth, alias / field / directive counts, batch size, message size and nesting — not just their content. These are structural caps (a <code>reject</code>, not a score), opt-in per endpoint. Injection inside a field flows through the same normalization and scoring as any other input.</p>
+
+  <h2>Importing CRS / ModSecurity rules</h2>
+  <p>The core ships a <code>seclang</code> parser and subset evaluator, so you can load OWASP CRS or your own <code>SecRule</code> files as a module via <code>[modules.crs]</code>. A boot-time report lists any rules skipped as outside the supported subset.</p>
+
+  <h2>Extending with WASM</h2>
+  <p>A Proxy-Wasm runtime (on <code>wasmi</code>) loads a <code>.wasm</code> filter as a module, with fuel and memory caps and a fail-closed posture. The runtime is open; signature verification and a plugin marketplace are enterprise features.</p>
+
+  <div class="doc-next">
+    <a class="btn btn-ghost" href="/docs/configuration">← Configuration</a>
+    <a class="btn btn-ghost" href="/boundary">Open vs enterprise →</a>
+  </div>
+</DocsLayout>

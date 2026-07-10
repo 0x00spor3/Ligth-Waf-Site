@@ -1,0 +1,42 @@
+---
+// SPDX-FileCopyrightText: 2026 0x00spor3
+// SPDX-License-Identifier: BUSL-1.1
+import Base from "./Base.astro";
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+import { DOCS_NAV } from "../consts";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+const { title, description } = Astro.props;
+// Normalize trailing slashes so "/docs/" and "/docs" both match.
+const path = Astro.url.pathname.replace(/\/$/, "") || "/";
+---
+
+<Base title={`${title} — Light WAF docs`} description={description}>
+  <Nav />
+  <div class="wrap docs">
+    <aside class="docs-side">
+      {
+        DOCS_NAV.map((g) => (
+          <nav class="dg">
+            <span class="dg-label">{g.group}</span>
+            {g.items.map((it) => (
+              <a href={it.href} class={path === it.href ? "active" : ""}>
+                {it.label}
+              </a>
+            ))}
+          </nav>
+        ))
+      }
+    </aside>
+    <main class="docs-main">
+      <article class="prose">
+        <slot />
+      </article>
+    </main>
+  </div>
+  <Footer />
+</Base>

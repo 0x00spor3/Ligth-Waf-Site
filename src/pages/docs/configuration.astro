@@ -1,0 +1,111 @@
+---
+// SPDX-FileCopyrightText: 2026 0x00spor3
+// SPDX-License-Identifier: BUSL-1.1
+import DocsLayout from "../../layouts/DocsLayout.astro";
+---
+
+<DocsLayout title="Configuration" description="The Light WAF open-core configuration reference: proxy, TLS, scoring and the block threshold, rate limiting, client-IP resolution, request limits, and detection modules.">
+  <h1>Configuration</h1>
+  <p class="lede">
+    The proxy reads one TOML file (<code>--config</code>). This is the reference for the open-core
+    sections. Certificate management at scale (ACME, mTLS) and the enterprise modules are covered on
+    the <a href="/boundary">boundary</a> page.
+  </p>
+
+  <h2>Proxy &amp; backend</h2>
+  <pre class="code">[proxy]
+listen  = "0.0.0.0:8080"          <span class="c"># where the WAF accepts client traffic</span>
+backend = "http://127.0.0.1:3000" <span class="c"># your origin; allowed requests are forwarded here</span></pre>
+
+  <h2>TLS</h2>
+  <p>Termination is off by default (the listener serves cleartext h1 + h2c). When enabled, the listener serves <em>only</em> TLS; an unreadable certificate at boot is fatal (fail-closed, no downgrade).</p>
+  <pre class="code">[tls]
+enabled   = true
+cert_path = "/etc/waf/tls/cert.pem"   <span class="c"># PEM chain, leaf first</span>
+key_path  = "/etc/waf/tls/key.pem"    <span class="c"># PKCS#8 / PKCS#1 / SEC1</span>
+alpn      = ["h2", "http/1.1"]</pre>
+  <p>Automatic ACME issuance/rotation and mTLS with managed PKI are enterprise features that plug into the same TLS seam.</p>
+
+  <h2>Detection &amp; the block threshold</h2>
+  <p>No single rule blocks a request — matched rules add points to a cumulative anomaly score, and the request is denied at the threshold.</p>
+  <pre class="code">[waf]
+mode            = "blocking"   <span class="c"># "blocking" enforces | "detection" observes only</span>
+block_threshold = 5            <span class="c"># deny when the score reaches this</span>
+paranoia_level  = 1            <span class="c"># 1..=4 — higher activates more (noisier) rules</span></pre>
+  <p>Severity maps to points here — this table, with the threshold, is your main tuning surface:</p>
+  <pre class="code">[waf.severity_scores]
+critical = 6   <span class="c"># a single critical (6) blocks on its own at threshold 5</span>
+error    = 4
+warning  = 3   <span class="c"># two warnings (3+3) also block</span>
+notice   = 2   <span class="c"># a lone notice never blocks</span></pre>
+
+  <h2>Resilience</h2>
+  <p>Explicit policy for when the WAF itself is degraded. Security failures fail closed; infrastructure failures fail open.</p>
+  <pre class="code">[resilience]
+on_upstream_error   = "fail_closed"   <span class="c"># origin down/timeout → 502 (closed) | 503 (open)</span>
+on_internal_error   = "fail_open"     <span class="c"># a module panic must not take down the site</span>
+on_config_error     = "fail_open"     <span class="c"># a bad reload → keep last-good config</span>
+on_parser_limit     = "fail_closed"   <span class="c"># normalization failed → 400 (closed)</span>
+upstream_timeout_ms = 30000</pre>
+
+  <h2>Rate limiting</h2>
+  <p>A per-client L7 token bucket. In the open core this is single-node; the enterprise tier shares one budget across a cluster via the same policy.</p>
+  <pre class="code">[rate_limit]
+enabled        = true
+key            = "client_ip"
+requests       = 100        <span class="c"># tokens per window</span>
+window_seconds = 60
+burst          = 100        <span class="c"># bucket capacity (default = requests)</span>
+action         = "block"    <span class="c"># "block" → 429 | "score" → add points</span></pre>
+
+  <h2>Client-IP resolution</h2>
+  <p>The client IP is derived once and reused. Fail-safe: with <code>trusted_proxies</code> empty, <code>X-Forwarded-For</code> is always ignored and the peer address is used — an unconfigured deploy can't be spoofed.</p>
+  <pre class="code">[network]
+trusted_proxies  = ["10.0.0.0/8", "::1"]   <span class="c"># CIDRs of YOUR proxies/LBs/CDNs</span>
+client_ip_header = "X-Forwarded-For"
+trusted_hops     = 1                        <span class="c"># hops to trust from the RIGHT</span></pre>
+
+  <h2>Request limits</h2>
+  <p>Structural caps; an oversized or malformed request is rejected before content inspection.</p>
+  <pre class="code">[limits]
+max_body_size   = 1048576   <span class="c"># 1 MiB</span>
+max_header_size = 8192
+max_headers     = 100
+max_params      = 100
+max_cookies     = 50
+max_json_depth  = 20</pre>
+
+  <h2>Detection modules</h2>
+  <p>Each native module is toggled on its own table. See the <a href="/docs/modules">module catalogue</a> for what they catch.</p>
+  <pre class="code">[modules.sqli]
+enabled = true
+
+[modules.xss]
+enabled = true
+<span class="c"># …rce, ssrf, path_traversal, lfi_rfi, ldap, nosql, ssti,</span>
+<span class="c">#   ssi, xxe, mail, scanner, header_injection, request_smuggling</span></pre>
+  <p>Structural GraphQL and gRPC caps (depth / aliases / fields / batch) are opt-in and endpoint-specific:</p>
+  <pre class="code">[modules.graphql]
+enabled   = false
+paths     = ["/graphql"]
+max_depth = 15
+max_batch = 10
+
+[modules.grpc]
+enabled           = false
+max_message_bytes = 4194304
+on_compressed     = "reject"   <span class="c"># opaque payload: "reject" | "passthrough"</span></pre>
+  <p>The CRS engine loads SecRule <code>.conf</code> files, and the WASM runtime loads Proxy-Wasm plugins:</p>
+  <pre class="code">[modules.crs]
+enabled = true
+files   = ["/etc/waf/rules.conf"]
+
+[modules.wasm]
+enabled = false
+<span class="c"># plugins = [ ... ]  — signature verification is an enterprise feature</span></pre>
+
+  <div class="doc-next">
+    <a class="btn btn-ghost" href="/docs/quickstart">← Quickstart</a>
+    <a class="btn btn-ghost" href="/docs/modules">Detection modules →</a>
+  </div>
+</DocsLayout>

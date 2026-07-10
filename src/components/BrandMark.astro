@@ -1,0 +1,18 @@
+---
+// SPDX-FileCopyrightText: 2026 0x00spor3
+// SPDX-License-Identifier: BUSL-1.1
+// The brand mark is a miniature Verdict Meter: two "allowed" ticks, a threshold notch (signal), and
+// a "blocked" tick past it — traffic accumulating to a verdict.
+interface Props {
+  size?: number;
+}
+const { size = 22 } = Astro.props;
+---
+
+<svg width={size} height={size} viewBox="0 0 22 22" aria-hidden="true">
+  <rect x="1.5" y="9" width="19" height="4" rx="2" fill="#0c0f16" stroke="#232a38"></rect>
+  <rect x="2.5" y="10" width="6" height="2" rx="1" fill="#2fce8e"></rect>
+  <rect x="9" y="10" width="3" height="2" rx="1" fill="#2fe0c0"></rect>
+  <rect x="13" y="10" width="6" height="2" rx="1" fill="#fb5468"></rect>
+  <rect x="11.4" y="6.5" width="1.2" height="9" rx="0.6" fill="#2fe0c0"></rect>
+</svg>

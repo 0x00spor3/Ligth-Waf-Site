@@ -1,0 +1,266 @@
+---
+// SPDX-FileCopyrightText: 2026 0x00spor3
+// SPDX-License-Identifier: BUSL-1.1
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+import { CORE_REPO, CRATES } from "../consts";
+
+// Content detection modules (the CRS-style rule modules). Structural GraphQL/gRPC validation and
+// L7 rate limiting are called out separately below.
+const modules = [
+  "SQLi", "XSS", "RCE / command injection", "Path traversal", "LFI / RFI", "SSRF",
+  "LDAP injection", "NoSQL injection", "SSTI", "SSI", "XXE", "Mail-header injection",
+  "Header injection (CRLF)", "Request smuggling (CL/TE)", "Webshells", "MSSQL procedures",
+  "Scanner fingerprinting",
+];
+
+const beyond = [
+  { t: "TLS termination", d: "rustls with HTTP/1.1 and HTTP/2 over ALPN, certificates from file, optional mutual-TLS — all fail-closed." },
+  { t: "L7 rate limiting", d: "A per-client token bucket at connection time; block with 429 or add to the anomaly score." },
+  { t: "Client-IP resolution", d: "Trusted-proxy / X-Forwarded-For handling, resolved once and fail-safe: unconfigured means un-spoofable." },
+  { t: "Request limits", d: "Structural caps on body, headers, params, cookies and JSON depth — oversized or malformed requests are rejected." },
+  { t: "Resilience posture", d: "Explicit fail-open / fail-closed policy per scenario: upstream error, module panic, bad reload, parser limit." },
+  { t: "Hot reload", d: "SIGHUP re-reads the config with validate-then-swap — a bad reload keeps the last-good config running." },
+];
+---
+
+<Base
+  title="Light WAF Core — the open engine"
+  description="The open-core reverse-proxy WAF in Rust: Layer-7 inspection, anomaly scoring, and a verdict in under a millisecond. Apache-2.0, on GitHub and crates.io."
+>
+  <Nav />
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="eyebrow">Open core · Apache-2.0</span>
+        <h1>The open engine <span class="accent">underneath</span>.</h1>
+        <p class="lede">
+          A reverse-proxy web application firewall in Rust. It inspects every request at Layer 7,
+          accumulates an anomaly score, and returns a verdict — in under a millisecond on the common
+          path. Complete and standalone on its own.
+        </p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href={CORE_REPO}>Core on GitHub</a>
+          <a class="btn btn-ghost" href="#crates">Browse the crates</a>
+        </div>
+        <div class="hero-meta">
+          <span><i></i>Apache-2.0 · open source</span>
+          <span class="mono">Rust · HTTP/1.1 + HTTP/2</span>
+          <span class="mono">&lt; 1 ms p99 common path</span>
+        </div>
+      </div>
+
+      <div class="terminal reveal">
+        <div class="tbar"><i></i><i></i><i></i><span>waf-proxy</span></div>
+        <pre><span class="c"># install the `waf` binary from crates.io</span>
+<span class="p">$</span> cargo install waf-proxy
+
+<span class="c"># run it against your backend (listens :8080)</span>
+<span class="p">$</span> waf --config config.toml
+
+<span class="c"># benign → forwarded, attack → blocked</span>
+<span class="p">$</span> curl -o /dev/null -w "%&#123;http_code&#125;\n" localhost:8080/
+<span class="ok">200</span>
+<span class="p">$</span> curl -o /dev/null -w "%&#123;http_code&#125;\n" \
+    "localhost:8080/?q=1' OR '1'='1"
+<span class="no">403</span></pre>
+      </div>
+    </div>
+  </header>
+
+  <!-- Model recap -->
+  <section id="model">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">How it decides</span>
+        <h2>Inspect, score, decide.</h2>
+        <p>
+          Every module that matches contributes points to a cumulative anomaly score (a CRS-style
+          model). When the score crosses your block threshold, the request is denied — and the full
+          breakdown is emitted in the decision log.
+        </p>
+      </div>
+      <div class="chips">
+        <span class="chip verdict" style="--c:#2fce8e">allow — forwarded</span>
+        <span class="chip verdict" style="--c:#fb5468">block — 403</span>
+        <span class="chip verdict" style="--c:#ff9d42">reject — 400 | 429</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Detection pipeline -->
+  <section id="pipeline">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Detection pipeline</span>
+        <h2>Phased inspection, cooperative scoring.</h2>
+        <p>Modules run in phases as the request is read; each contributes to the same score. No single rule blocks on its own unless it's worth it.</p>
+      </div>
+      <div class="phases">
+        <span class="phase">Connection</span><span class="arrow">→</span>
+        <span class="phase">Headers</span><span class="arrow">→</span>
+        <span class="phase">Body</span><span class="arrow">→</span>
+        <span class="phase" style="background:transparent;border-color:var(--line-2);color:var(--ink-dim)">backend</span>
+      </div>
+      <div class="chips">
+        {modules.map((m) => <span class="chip">{m}</span>)}
+      </div>
+      <div class="two-col" style="margin-top:1.6rem">
+        <div class="panel-block">
+          <h3>Structural protocol validation</h3>
+          <p>GraphQL and gRPC operations are validated on their shape — depth, aliases, fields, batch size — not just their content, to cap abuse of typed APIs.</p>
+        </div>
+        <div class="panel-block">
+          <h3>Anti-evasion normalization</h3>
+          <p>Double-encoding-aware percent-decoding, NFKC, and pipeline-wide overlong-collapse fold evasions into a canonical form <em>before</em> inspection. OWASP CRS / ModSecurity rules import via a native seclang parser.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Beyond detection -->
+  <section id="beyond">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">More than a matcher</span>
+        <h2>A production reverse proxy.</h2>
+        <p>Detection is one part. The core is a real edge proxy with the operational pieces you need to put it in front of traffic.</p>
+      </div>
+      <div class="feature-grid">
+        {beyond.map((f) => (
+          <div class="feature">
+            <h3>{f.t}</h3>
+            <p>{f.d}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Performance -->
+  <section id="performance">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Performance</span>
+        <h2>Fast by construction.</h2>
+        <p>A WAF sits in the request path, so its overhead is a feature. The core is built to stay out of the way of clean traffic.</p>
+      </div>
+      <div class="perf">
+        <div class="perf-stat">
+          <span class="pv">&lt; 1 ms</span>
+          <span class="pl">p99 on the common path</span>
+        </div>
+        <div class="perf-points">
+          <div class="feature">
+            <h3>A fast path for benign traffic</h3>
+            <p>A <span class="mono">RegexSet</span> content prefilter lets clean requests skip the heavy per-rule matching — only suspicious input pays for full inspection.</p>
+          </div>
+          <div class="feature">
+            <h3>Rust, async, no GC</h3>
+            <p>Built on Tokio with no garbage collector — no pause spikes on the request path, and a small, predictable memory footprint.</p>
+          </div>
+          <div class="feature">
+            <h3>Phased &amp; short-circuiting</h3>
+            <p>Inspection runs in phases as the request is read and stops as soon as a verdict is reached — work you don't need never runs.</p>
+          </div>
+        </div>
+      </div>
+      <p class="perf-note">
+        <b>Fast, and proven correct.</b> A versioned 260-case malicious/benign corpus gates accuracy and guards
+        against regressions, so tuning for speed never quietly drops coverage. The benchmark and corpus live in
+        the open repository.
+      </p>
+    </div>
+  </section>
+
+  <!-- Observability & extensibility -->
+  <section id="extend">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Observe &amp; extend</span>
+        <h2>Instrumented, and built to extend — not to fork.</h2>
+        <p>The core emits a stable telemetry contract and exposes typed extension seams, so you add capability by injection, not by patching.</p>
+      </div>
+      <div class="two-col">
+        <div class="panel-block">
+          <h3>Observability</h3>
+          <p>Prometheus <span class="mono">/metrics</span> and a structured JSON decision log — including the per-rule score contributions behind every verdict. This is the exact contract the enterprise control plane consumes.</p>
+        </div>
+        <div class="panel-block">
+          <h3>Extension seams</h3>
+          <p>A builder wires in typed seams — the distributed <span class="mono">StateStore</span>, the <span class="mono">TlsCertSource</span> — and a WASM plugin runtime (Proxy-Wasm on <span class="mono">wasmi</span>) loads your own modules. The enterprise tier plugs in here, without touching the core.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Crates -->
+  <section id="crates">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">On crates.io</span>
+        <h2>Six crates, one workspace.</h2>
+        <p>The core is published to crates.io — build against the pieces you need, or run the proxy binary directly.</p>
+      </div>
+      <div class="crates">
+        {CRATES.map((c) => (
+          <a class="crate" href={c.url}>
+            <span class="cname">{c.name}<span class="arr">↗</span></span>
+            <p>{c.blurb}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Get started -->
+  <section id="start">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Get started</span>
+        <h2>Running in two minutes.</h2>
+        <p>Install the <span class="mono">waf</span> binary from crates.io, or build from source — it needs only Rust and cargo, and listens on <span class="mono">:8080</span>.</p>
+      </div>
+      <div class="two-col">
+        <div class="panel-block">
+          <h3>Install &amp; run</h3>
+          <pre class="code"><span class="c"># install the `waf` binary from crates.io</span>
+<span class="p">$</span> cargo install waf-proxy
+<span class="p">$</span> waf --config config.toml
+
+<span class="c"># …or build from source</span>
+<span class="p">$</span> git clone {CORE_REPO}
+<span class="p">$</span> cd Light-WAF && cargo run -p waf-proxy -- --config config.toml</pre>
+        </div>
+        <div class="panel-block">
+          <h3>Minimal config</h3>
+          <pre class="code"><span class="c"># config.toml</span>
+[proxy]
+listen  = "0.0.0.0:8080"
+backend = "http://127.0.0.1:3000"
+
+[waf]
+mode = "blocking"
+block_threshold = 5</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="wrap">
+      <h2>Read it, run it, extend it.</h2>
+      <p>The whole engine is open source under Apache-2.0. Star it, file issues, or build a plugin.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href={CORE_REPO}>Core on GitHub</a>
+        <a class="btn btn-ghost" href="/#dashboard">See the enterprise control plane</a>
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+</Base>

@@ -1,0 +1,48 @@
+---
+// SPDX-FileCopyrightText: 2026 0x00spor3
+// SPDX-License-Identifier: BUSL-1.1
+import DocsLayout from "../../layouts/DocsLayout.astro";
+import { CORE_REPO } from "../../consts";
+---
+
+<DocsLayout title="Quickstart" description="Install and run the Light WAF open core in two minutes: install the waf binary, write a minimal config, and watch it block an attack.">
+  <h1>Quickstart</h1>
+  <p class="lede">Get the open core running in front of a backend in about two minutes. You need only Rust and cargo.</p>
+
+  <h2>Install</h2>
+  <p>Install the <code>waf</code> binary straight from crates.io:</p>
+  <pre class="code"><span class="p">$</span> cargo install waf-proxy</pre>
+  <p>Or build from source:</p>
+  <pre class="code"><span class="p">$</span> git clone {CORE_REPO}
+<span class="p">$</span> cd Light-WAF &amp;&amp; cargo build --release</pre>
+
+  <h2>Configure</h2>
+  <p>Create a <code>config.toml</code> with a listener and your backend. This is the smallest useful config:</p>
+  <pre class="code"><span class="c"># config.toml</span>
+[proxy]
+listen  = "0.0.0.0:8080"
+backend = "http://127.0.0.1:3000"
+
+[waf]
+mode = "blocking"        <span class="c"># "blocking" enforces, "detection" only observes</span>
+block_threshold = 5      <span class="c"># deny when the anomaly score reaches this</span></pre>
+  <p>See the full <a href="/docs/configuration">configuration reference</a> for every section.</p>
+
+  <h2>Run</h2>
+  <pre class="code"><span class="p">$</span> waf --config config.toml
+<span class="c"># or, from a source checkout:</span>
+<span class="p">$</span> cargo run -p waf-proxy -- --config config.toml</pre>
+  <p>The WAF listens on <code>:8080</code> and forwards allowed requests to your backend.</p>
+
+  <h2>Verify</h2>
+  <p>A benign request is forwarded; an obvious attack is blocked with a <code>403</code>:</p>
+  <pre class="code"><span class="p">$</span> curl -o /dev/null -w "%&#123;http_code&#125;\n" localhost:8080/
+<span class="ok">200</span>
+<span class="p">$</span> curl -o /dev/null -w "%&#123;http_code&#125;\n" "localhost:8080/?q=1' OR '1'='1"
+<span class="no">403</span></pre>
+
+  <div class="doc-next">
+    <a class="btn btn-ghost" href="/docs/configuration">Configuration →</a>
+    <a class="btn btn-ghost" href="/docs/modules">Detection modules →</a>
+  </div>
+</DocsLayout>
