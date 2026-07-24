@@ -12,11 +12,12 @@ const map = [
   { area: "Rate limiting & state", open: "Single-node L7 token bucket (the StateStore trait + in-memory impl).", ent: "One budget shared across the fleet via Redis, plus IP reputation." },
   { area: "TLS", open: "Termination from file (rustls, HTTP/1.1 + HTTP/2 via ALPN).", ent: "ACME issuance & hitless rotation, mTLS with managed PKI, multi-node certs." },
   { area: "Rules", open: "seclang / ModSecurity parser + evaluation engine.", ent: "Curated premium content, and governed publish / rollback with a per-node agent." },
-  { area: "Observability", open: "Prometheus /metrics + a structured JSON decision log.", ent: "Dashboards, long-term retention, blocked-request drill-down, alerting." },
+  { area: "Observability", open: "Prometheus /metrics + a structured JSON decision log.", ent: "Dashboards, long-term retention, blocked-request drill-down, full request capture, alerting." },
   { area: "Access control", open: "A single static bearer token.", ent: "RBAC, SSO (OIDC), server-side sessions, revocable service tokens." },
   { area: "Audit & compliance", open: "—", ent: "A signed, hash-chained audit log and on-demand SOC2 / PCI evidence bundles." },
   { area: "SIEM", open: "Raw logs (your own shipper).", ent: "A push forwarder — normalized, at-least-once, with visible lag." },
   { area: "WASM plugins", open: "The runtime (Proxy-Wasm on wasmi).", ent: "Signature verification & marketplace." },
+  { area: "Deployment", open: "Run the proxy binary anywhere (systemd, a container).", ent: "Kubernetes-native: Helm charts, a WafProxy operator, GitOps & Gateway API examples." },
 ];
 
 const guarantees = [

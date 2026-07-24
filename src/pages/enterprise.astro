@@ -21,6 +21,19 @@ const scale = [
   { t: "Signed WASM plugins", d: "Extend detection with your own WASM modules, gated by a detached signature. A plugin that fails verification never loads." },
 ];
 
+const operate = [
+  { t: "Full request capture", d: "Optionally capture the complete denied request — headers, cookies and body — off the data path, so the drill-down shows exactly what was blocked. Raw by default with node-side redaction, short retention, RBAC-gated and audited on every view." },
+  { t: "Attack-signature alerting", d: "Rules over the decision stream fire when a pattern crosses a threshold (a per-IP or per-rule block burst), with cooldowns, and push to a webhook." },
+  { t: "Live, no-refresh dashboard", d: "Events and alerts stream in over SSE — the console updates the moment a node reports, without polling latency or a page reload." },
+];
+
+const deploy = [
+  { t: "Helm charts", d: "One chart puts a hardened WAF in front of a workload; another runs the control plane with bundled or managed Postgres. Everything is a value — modules, TLS, rate limits, capture." },
+  { t: "WafProxy operator", d: "A namespaced CRD (waf.io/v1alpha1): declare a WafProxy and the operator renders and owns the ConfigMap, Deployment and Service. Delete the CR and it cleans up." },
+  { t: "GitOps & Gateway API", d: "Ready-made Argo/Flux, Ingress, Gateway API and cert-manager examples — drop the WAF into the traffic path you already run." },
+  { t: "Graceful, hardened pods", d: "Non-root, read-only rootfs, dropped capabilities; on SIGTERM readiness flips so Kubernetes drains in-flight requests before the pod exits." },
+];
+
 const govern = [
   { t: "RBAC & SSO", d: "Viewer / operator / admin roles, local accounts, and OpenID Connect single sign-on behind HttpOnly session cookies." },
   { t: "Signed audit log", d: "Every action hash-chained and Ed25519-signed — tamper-evident, and verifiable on demand from the dashboard." },
@@ -38,7 +51,7 @@ const trust = [
 
 <Base
   title="Light WAF Enterprise — operate & govern the WAF at scale"
-  description="The commercial tier: a control plane, dashboard, governed rule management, RBAC/SSO, signed audit, SOC2/PCI compliance evidence, and SIEM export — on top of the open core, self-hosted."
+  description="The commercial tier: a control plane, dashboard, governed rule management, full request capture, RBAC/SSO, signed audit, SOC2/PCI compliance evidence, SIEM export, and Kubernetes-native deployment — on top of the open core, self-hosted."
 >
   <Nav />
 
@@ -133,6 +146,14 @@ const trust = [
           <div class="shot-cap"><b>Manage.</b> Publish and roll back ruleset versions; an agent validates and hot-reloads, and you watch convergence.</div>
         </div>
       </div>
+      <div class="feature-grid" style="margin-top:1.5rem">
+        {operate.map((f) => (
+          <div class="feature">
+            <h3>{f.t}</h3>
+            <p>{f.d}</p>
+          </div>
+        ))}
+      </div>
     </div>
   </section>
 
@@ -156,6 +177,25 @@ const trust = [
         <div class="shot-bar"><i></i><i></i><i></i><span>compliance</span></div>
         <img src="/shots/compliance.png" alt="Compliance report — a signed SOC2/PCI evidence bundle" loading="lazy" />
         <div class="shot-cap"><b>Compliance.</b> A signed SOC2 / PCI evidence bundle, generated for any period and verifiable independently.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Deploy — Kubernetes-native -->
+  <section id="deploy">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Kubernetes-native</span>
+        <h2>Ship it the way you already run things.</h2>
+        <p>Helm charts, a first-class operator, and GitOps examples — a WAF per workload, not a rewrite of the data path. Images stay in your registry; nothing is ever pushed to a public one.</p>
+      </div>
+      <div class="feature-grid">
+        {deploy.map((f) => (
+          <div class="feature">
+            <h3>{f.t}</h3>
+            <p>{f.d}</p>
+          </div>
+        ))}
       </div>
     </div>
   </section>

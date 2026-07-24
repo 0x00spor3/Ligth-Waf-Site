@@ -18,8 +18,10 @@ const protect = [
 const operate = [
   { t: "Control-plane dashboard", d: "A single pane over the whole cluster: block rate, traffic disposition, denied-event volume and per-node latency." },
   { t: "Verdict drill-down", d: "Open any blocked request and see the accumulated score broken down per rule and severity — exactly why it was stopped." },
+  { t: "Full request capture", d: "Optionally capture the complete denied request — headers, cookies and body — off the data path. Redacted node-side, short retention, RBAC-gated and audited on every view." },
   { t: "Alerting", d: "Fire on per-IP or per-rule bursts within a window, with cooldowns, and push to a webhook. Attack signatures surface themselves." },
   { t: "Governed rule management", d: "Publish and roll back ruleset versions from the dashboard; a per-node agent validates and hot-reloads, and you watch convergence." },
+  { t: "Kubernetes-native", d: "Helm charts and a WafProxy operator run a hardened WAF per workload, with GitOps and Gateway API examples. Images stay in your registry." },
 ];
 const govern = [
   { t: "RBAC & SSO", d: "Viewer / operator / admin roles, local accounts, and OpenID Connect single sign-on backed by HttpOnly session cookies." },
@@ -195,7 +197,9 @@ const govern = [
             <li>Managed ACME TLS + curated premium rules</li>
             <li>GraphQL/gRPC schema enforcement, bot detection</li>
             <li>control panel, dashboard & governed rule management</li>
+            <li>full request capture, alerting & live dashboard</li>
             <li>RBAC/SSO, signed audit, compliance & SIEM export</li>
+            <li>Kubernetes-native: Helm charts & WafProxy operator</li>
           </ul>
         </div>
       </div>
