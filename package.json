@@ -1,9 +1,10 @@
 {
   "name": "lightwaf-site",
   "type": "module",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
-  "description": "Marketing landing site for Light WAF.",
+  "description": "Website and documentation for Light WAF.",
+  "license": "Apache-2.0",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",

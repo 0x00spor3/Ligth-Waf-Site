@@ -1,8 +1,8 @@
 ---
 // SPDX-FileCopyrightText: 2026 0x00spor3
-// SPDX-License-Identifier: BUSL-1.1
+// SPDX-License-Identifier: Apache-2.0
 import BrandMark from "./BrandMark.astro";
-import { CORE_REPO } from "../consts";
+import { REPO } from "../consts";
 ---
 
 <nav class="nav">
@@ -10,10 +10,11 @@ import { CORE_REPO } from "../consts";
     <a class="brand" href="/"><BrandMark /> Light<b>WAF</b></a>
     <div class="nav-links">
       <a href="/core">Core</a>
-      <a href="/enterprise">Enterprise</a>
-      <a href="/boundary">Boundary</a>
+      <a href="/scale">At scale</a>
+      <a href="/architecture">Architecture</a>
       <a href="/docs">Docs</a>
-      <a class="btn btn-ghost" href={CORE_REPO}>Core on GitHub</a>
+      <a href="/community">Community</a>
+      <a class="btn btn-ghost" href={REPO}>GitHub</a>
     </div>
   </div>
 </nav>

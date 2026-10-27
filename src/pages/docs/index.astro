@@ -1,48 +1,143 @@
 ---
 // SPDX-FileCopyrightText: 2026 0x00spor3
-// SPDX-License-Identifier: BUSL-1.1
+// SPDX-License-Identifier: Apache-2.0
 import DocsLayout from "../../layouts/DocsLayout.astro";
-import { CORE_REPO, CRATES, CONTACT_MAILTO, RELEASES } from "../../consts";
+import { REPO, repoFile, CORE_CRATES, COMPONENT_CRATES, crateUrl, IMAGE_REGISTRY, IMAGES, VERSION, CHANGELOG } from "../../consts";
+
+const secrets = [
+  ["WAF_REDIS_URL", "proxy", "Redis connection for cluster-wide rate limit / reputation"],
+  ["WAF_CERT_STORE_KEY", "proxy", "encrypts the ACME private key at rest (clustered DNS-01)"],
+  ["WAF_CAPTURE_TOKEN", "proxy", "ingest bearer for shipping captured requests (matches WAF_CP_API_TOKEN)"],
+  ["CF_API_TOKEN, AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY", "proxy", "DNS-01 provider credentials"],
+  ["WAF_CP_DATABASE_URL", "control plane", "Postgres connection string"],
+  ["WAF_CP_API_TOKEN", "control plane", "static bearer token (governance off)"],
+  ["WAF_CP_AUDIT_KEY", "control plane", "Ed25519 seed (64 hex) signing the audit chain — must persist"],
+  ["WAF_CP_BOOTSTRAP_ADMIN_PASSWORD", "control plane", "initial admin password, used once"],
+  ["WAF_CP_OIDC_CLIENT_SECRET", "control plane", "OIDC client secret"],
+  ["WAF_CP_SIEM_AUTH_<NAME>", "control plane", "auth header for SIEM destination <name>"],
+  ["WAF_AGENT_TOKEN", "node agent", "control-plane service token"],
+];
 ---
 
-<DocsLayout title="Documentation" description="Documentation for the Light WAF open core (Apache-2.0): quickstart, configuration reference, and the detection module catalogue.">
+<DocsLayout title="Documentation" description="Light WAF documentation: quickstart, concepts, the configuration reference, detection modules and at-scale components, and the operator guide for the control plane, rule management, governance, compliance, SIEM and Kubernetes.">
   <h1>Documentation</h1>
   <p class="lede">
-    Everything you need to run and configure the <strong>open core</strong> — the standalone,
-    Apache-2.0 WAF. The enterprise control plane has its own operator guide, available to customers.
+    How to run, configure and operate Light WAF — from a single <code>waf</code> binary in front of
+    one backend to a governed fleet with a control plane. These docs cover version {VERSION}
+    (<a href={CHANGELOG}>changelog</a>).
   </p>
 
   <h2>Start here</h2>
   <ul>
     <li><a href="/docs/quickstart">Quickstart</a> — install the <code>waf</code> binary, point it at your backend, and see it block.</li>
-    <li><a href="/docs/configuration">Configuration</a> — the full config file, section by section.</li>
-    <li><a href="/docs/modules">Detection modules</a> — what each module catches, and how requests are scored.</li>
+    <li><a href="/docs/concepts">Concepts</a> — how a request is judged: the anomaly score, the block threshold, verdicts.</li>
+    <li><a href="/docs/full-stack">Full stack</a> — run the WAF, the control plane and the node agent together.</li>
   </ul>
 
-  <h2>Crate reference</h2>
-  <p>The core is published to crates.io; API docs are on docs.rs.</p>
+  <h2>The three services</h2>
+  <p>A single node needs only the WAF. A fleet adds up to two more services, neither of them on the request path:</p>
+  <div class="map">
+    <table>
+      <thead>
+        <tr><th>Service</th><th>Binary</th><th>Role</th><th>Request path?</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="area">WAF proxy</td>
+          <td class="open"><code>waf</code> or <code>waf-enterprise</code></td>
+          <td class="open">Terminates traffic, inspects every request, allows or blocks. <code>waf</code> is the core; <code>waf-enterprise</code> adds the <a href="/docs/components">at-scale components</a>.</td>
+          <td class="open"><strong>Yes</strong></td>
+        </tr>
+        <tr>
+          <td class="area">Control plane</td>
+          <td class="open"><code>waf-controlplane</code></td>
+          <td class="open">Collects telemetry, serves the dashboard and API, governs rules and users.</td>
+          <td class="open">No</td>
+        </tr>
+        <tr>
+          <td class="area">Node agent</td>
+          <td class="open"><code>waf-node-agent</code></td>
+          <td class="open">Pulls published rulesets onto each WAF node and triggers a reload.</td>
+          <td class="open">No</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Reference</h2>
+  <ul>
+    <li><a href="/docs/configuration">Configuration</a> — the core config file, section by section.</li>
+    <li><a href="/docs/modules">Detection modules</a> — what each module catches, and how requests are scored.</li>
+    <li><a href="/docs/components">At-scale components</a> — the <code>[enterprise.*]</code> tables: Redis state, managed TLS, reputation, curated rules, schema enforcement, bot detection, signed plugins, request capture.</li>
+  </ul>
+
+  <h2>Operate</h2>
+  <ul>
+    <li><a href="/docs/control-plane">Control plane &amp; dashboard</a> — configuration, telemetry, the dashboard tour, alerting, the API.</li>
+    <li><a href="/docs/rule-management">Rule management</a> — publish and roll back ruleset versions, the node agent, convergence.</li>
+    <li><a href="/docs/governance">Governance</a> — RBAC, users, service tokens, sessions, OIDC SSO, the signed audit log.</li>
+    <li><a href="/docs/compliance-siem">Compliance &amp; SIEM</a> — signed SOC2/PCI evidence bundles and the SIEM feed.</li>
+    <li><a href="/docs/operations">Operations</a> — reloads, the failure posture, monitoring, backups, troubleshooting.</li>
+    <li><a href="/docs/kubernetes">Kubernetes</a> — Helm charts, the <code>WafProxy</code> operator, capture on k8s.</li>
+  </ul>
+
+  <h2>Secrets</h2>
+  <p>Every service reads its secrets from <strong>environment variables that override the config file</strong>, so the <code>.toml</code> files can be committed safely.</p>
+  <div class="map">
+    <table>
+      <thead>
+        <tr><th>Env var</th><th>Used by</th><th>What it is</th></tr>
+      </thead>
+      <tbody>
+        {secrets.map(([name, by, what]) => (
+          <tr>
+            <td class="area"><code>{name}</code></td>
+            <td class="open">{by}</td>
+            <td class="open">{what}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Crates</h2>
+  <p>Fourteen crates are published on crates.io, all on version {VERSION}; API docs are on docs.rs.</p>
   <div class="map">
     <table>
       <thead>
         <tr><th>Crate</th><th>What it is</th><th>Links</th></tr>
       </thead>
       <tbody>
-        {CRATES.map((c) => (
+        {[...CORE_CRATES, ...COMPONENT_CRATES].map((c) => (
           <tr>
             <td class="area">{c.name}</td>
             <td class="open">{c.blurb}</td>
-            <td><a href={`https://docs.rs/${c.name}`}>docs.rs</a> · <a href={c.url}>crates.io</a></td>
+            <td><a href={`https://docs.rs/${c.name}`}>docs.rs</a> · <a href={crateUrl(c.name)}>crates.io</a></td>
           </tr>
         ))}
       </tbody>
     </table>
   </div>
-  <p style="margin-top:1rem"><a href={CORE_REPO}>Browse the source on GitHub →</a> · <a href={RELEASES}>Release history →</a></p>
 
-  <div class="callout">
-    <p><strong>Running the enterprise tier?</strong> The control plane, governed rule management, RBAC/SSO, compliance and SIEM export ship with a dedicated operator guide, available to customers under the commercial licence.</p>
-    <p class="mnemonic" style="border:none;padding:0;margin-top:.6rem;font-style:normal">
-      <a href={CONTACT_MAILTO}>Request enterprise access →</a>
-    </p>
+  <h2 id="container-images">Container images</h2>
+  <p>Multi-arch (amd64 + arm64) images on the GitHub Container Registry. They run as a non-root user on a distroless base.</p>
+  <div class="map">
+    <table>
+      <thead>
+        <tr><th>Image</th><th>What it runs</th></tr>
+      </thead>
+      <tbody>
+        {IMAGES.map((i) => (
+          <tr>
+            <td class="area"><code>{IMAGE_REGISTRY}/{i.name}:{VERSION}</code></td>
+            <td class="open">{i.blurb}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   </div>
+
+  <p style="margin-top:1.4rem">
+    <a href={REPO}>Source on GitHub →</a> · <a href={repoFile("ARCHITECTURE.md")}>Architecture notes →</a> · <a href={`${REPO}/tree/main/scripts`}>Per-feature runbooks →</a>
+  </p>
 </DocsLayout>

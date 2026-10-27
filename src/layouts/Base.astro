@@ -1,6 +1,6 @@
 ---
 // SPDX-FileCopyrightText: 2026 0x00spor3
-// SPDX-License-Identifier: BUSL-1.1
+// SPDX-License-Identifier: Apache-2.0
 import "@fontsource-variable/space-grotesk";
 import "@fontsource/ibm-plex-sans/400.css";
 import "@fontsource/ibm-plex-sans/500.css";
@@ -8,6 +8,7 @@ import "@fontsource/ibm-plex-sans/600.css";
 import "@fontsource/ibm-plex-mono/400.css";
 import "@fontsource/ibm-plex-mono/500.css";
 import "../styles/global.css";
+import { REPO, VERSION } from "../consts";
 
 interface Props {
   title?: string;
@@ -15,7 +16,7 @@ interface Props {
 }
 const {
   title = "Light WAF — risk accumulates, the threshold decides",
-  description = "An open-core web application firewall: it inspects every request, scores it against your rules, and blocks when the score crosses the threshold — with a control plane that shows you exactly why.",
+  description = "An open-source web application firewall in Rust: it inspects every request, scores it against your rules, and blocks when the score crosses the threshold — with a control plane that shows you exactly why. Apache-2.0.",
 } = Astro.props;
 
 // `Astro.site` comes from `site` in astro.config.mjs. Canonical + social URLs derive from it.
@@ -28,6 +29,15 @@ const jsonLd = {
   "@graph": [
     { "@type": "Organization", name: "Light WAF", url: site.href, logo: new URL("/favicon.svg", site).href },
     { "@type": "WebSite", name: "Light WAF", url: site.href },
+    {
+      "@type": "SoftwareSourceCode",
+      name: "Light WAF",
+      description: "A Layer-7 web application firewall reverse proxy in Rust.",
+      codeRepository: REPO,
+      programmingLanguage: "Rust",
+      license: "https://www.apache.org/licenses/LICENSE-2.0",
+      version: VERSION,
+    },
   ],
 };
 ---

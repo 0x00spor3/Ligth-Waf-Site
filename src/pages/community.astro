@@ -1,0 +1,112 @@
+---
+// SPDX-FileCopyrightText: 2026 0x00spor3
+// SPDX-License-Identifier: Apache-2.0
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+import {
+  REPO,
+  ISSUES,
+  CONTRIBUTING,
+  CODE_OF_CONDUCT,
+  SECURITY_POLICY,
+  SECURITY_ADVISORY,
+  CHANGELOG,
+  RELEASES,
+  LICENSE,
+} from "../consts";
+
+const ways = [
+  { t: "Report a bug", d: "Open an issue with the config, the request, and the verdict you expected. False positives — legitimate traffic that gets blocked — belong here, with a reproducing request.", href: ISSUES, cta: "Open an issue" },
+  { t: "Contribute code or rules", d: "Fixes, detection improvements, new corpus cases, docs. Read the contributing guide first — it covers the build, the test suites, and the sign-off.", href: CONTRIBUTING, cta: "Contributing guide" },
+  { t: "Follow the releases", d: "Every release is tagged on GitHub with notes, and the changelog lists what changed in each version.", href: RELEASES, cta: "Releases" },
+];
+---
+
+<Base
+  title="Community — Light WAF"
+  description="Contribute to Light WAF: report bugs and bypasses, send code and detection rules with a DCO sign-off, report vulnerabilities privately, and follow the releases."
+>
+  <Nav />
+
+  <header class="hero">
+    <div class="wrap">
+      <span class="eyebrow">Community</span>
+      <h1>Built in the open. <span class="accent">Join in</span>.</h1>
+      <p class="lede">
+        Light WAF is developed on GitHub under Apache-2.0. Issues, pull requests, detection rules and
+        documentation fixes are all welcome.
+      </p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href={REPO}>View on GitHub</a>
+        <a class="btn btn-ghost" href={CONTRIBUTING}>How to contribute</a>
+      </div>
+    </div>
+  </header>
+
+  <section id="ways">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Get involved</span>
+        <h2>Ways to help.</h2>
+      </div>
+      <div class="model">
+        {ways.map((w) => (
+          <div class="model-step">
+            <h3>{w.t}</h3>
+            <p>{w.d}</p>
+            <a class="seealso" href={w.href}>{w.cta} →</a>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section id="security">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Security</span>
+        <h2>Found a vulnerability? Report it privately.</h2>
+        <p>
+          Light WAF is a security product, so a way to get an attack past it is a vulnerability too.
+          Don't open a public issue for a detection bypass or a flaw in the proxy, control plane, agent
+          or operator — use GitHub's private vulnerability reporting. The security policy explains the
+          scope and what to expect.
+        </p>
+      </div>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href={SECURITY_ADVISORY}>Report a vulnerability</a>
+        <a class="btn btn-ghost" href={SECURITY_POLICY}>Security policy</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="rules">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Ground rules</span>
+        <h2>How contributions work.</h2>
+      </div>
+      <div class="feature-grid">
+        <div class="feature">
+          <h3>Apache-2.0</h3>
+          <p>Everything in the repository is Apache-2.0, and contributions are accepted under the same license. <a href={LICENSE}>Read the license</a>.</p>
+        </div>
+        <div class="feature">
+          <h3>DCO sign-off</h3>
+          <p>Every commit carries a Developer Certificate of Origin sign-off — <span class="mono">git commit -s</span>. There is no CLA to sign.</p>
+        </div>
+        <div class="feature">
+          <h3>Code of conduct</h3>
+          <p>The project follows the Contributor Covenant. Be respectful; the <a href={CODE_OF_CONDUCT}>code of conduct</a> says how to report a problem.</p>
+        </div>
+        <div class="feature">
+          <h3>Changelog</h3>
+          <p>User-visible changes are recorded in the <a href={CHANGELOG}>changelog</a>, following Keep a Changelog and Semantic Versioning.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+</Base>

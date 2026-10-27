@@ -1,20 +1,20 @@
 ---
 // SPDX-FileCopyrightText: 2026 0x00spor3
-// SPDX-License-Identifier: BUSL-1.1
+// SPDX-License-Identifier: Apache-2.0
 import DocsLayout from "../../layouts/DocsLayout.astro";
-import { CORE_REPO } from "../../consts";
+import { REPO, IMAGE_REGISTRY, VERSION } from "../../consts";
 ---
 
-<DocsLayout title="Quickstart" description="Install and run the Light WAF open core in two minutes: install the waf binary, write a minimal config, and watch it block an attack.">
+<DocsLayout title="Quickstart" description="Install and run Light WAF in two minutes: install the waf binary (or pull the container image), write a minimal config, and watch it block an attack.">
   <h1>Quickstart</h1>
-  <p class="lede">Get the open core running in front of a backend in about two minutes. You need only Rust and cargo.</p>
+  <p class="lede">Get the WAF running in front of a backend in about two minutes — with cargo, or with the container image.</p>
 
   <h2>Install</h2>
-  <p>Install the <code>waf</code> binary straight from crates.io:</p>
+  <p>Install the <code>waf</code> binary straight from crates.io (needs Rust and cargo):</p>
   <pre class="code"><span class="p">$</span> cargo install waf-proxy</pre>
   <p>Or build from source:</p>
-  <pre class="code"><span class="p">$</span> git clone {CORE_REPO}
-<span class="p">$</span> cd Light-WAF &amp;&amp; cargo build --release</pre>
+  <pre class="code"><span class="p">$</span> git clone {REPO}
+<span class="p">$</span> cd Light-WAF &amp;&amp; cargo build --release -p waf-proxy</pre>
 
   <h2>Configure</h2>
   <p>Create a <code>config.toml</code> with a listener and your backend. This is the smallest useful config:</p>
@@ -24,25 +24,42 @@ listen  = "0.0.0.0:8080"
 backend = "http://127.0.0.1:3000"
 
 [waf]
-mode = "blocking"        <span class="c"># "blocking" enforces, "detection" only observes</span>
+mode = "blocking"        <span class="c"># "blocking" enforces | "detection-only" observes and logs</span>
 block_threshold = 5      <span class="c"># deny when the anomaly score reaches this</span></pre>
-  <p>See the full <a href="/docs/configuration">configuration reference</a> for every section.</p>
+  <p>
+    Tuning a new deployment? Start with <code>mode = "detection-only"</code>: every verdict is computed
+    and logged, but nothing is blocked. The repository's <a href={`${REPO}/tree/main/examples`}>examples</a>
+    have ready profiles from detection-only to strict. See the <a href="/docs/configuration">configuration
+    reference</a> for every section.
+  </p>
 
   <h2>Run</h2>
   <pre class="code"><span class="p">$</span> waf --config config.toml
 <span class="c"># or, from a source checkout:</span>
-<span class="p">$</span> cargo run -p waf-proxy -- --config config.toml</pre>
+<span class="p">$</span> cargo run --release -p waf-proxy -- --config config.toml</pre>
   <p>The WAF listens on <code>:8080</code> and forwards allowed requests to your backend.</p>
+
+  <h3>With the container image</h3>
+  <p>
+    The <code>waf-enterprise</code> image runs the same config — every at-scale component is off until
+    you enable it. It reads <code>/etc/waf/config.toml</code> by default. Inside the container
+    <code>127.0.0.1</code> is the container itself, so point <code>backend</code> at an address the
+    container can reach (for a backend on the Docker host: <code>http://host.docker.internal:3000</code>).
+  </p>
+  <pre class="code"><span class="p">$</span> docker run --rm -p 8080:8080 \
+    -v "$PWD/config.toml:/etc/waf/config.toml:ro" \
+    {IMAGE_REGISTRY}/waf-enterprise:{VERSION}</pre>
 
   <h2>Verify</h2>
   <p>A benign request is forwarded; an obvious attack is blocked with a <code>403</code>:</p>
   <pre class="code"><span class="p">$</span> curl -o /dev/null -w "%&#123;http_code&#125;\n" localhost:8080/
 <span class="ok">200</span>
-<span class="p">$</span> curl -o /dev/null -w "%&#123;http_code&#125;\n" "localhost:8080/?q=1' OR '1'='1"
+<span class="p">$</span> curl -o /dev/null -w "%&#123;http_code&#125;\n" "localhost:8080/?q=1'+OR+'1'='1"
 <span class="no">403</span></pre>
 
-  <div class="doc-next">
-    <a class="btn btn-ghost" href="/docs/configuration">Configuration →</a>
-    <a class="btn btn-ghost" href="/docs/modules">Detection modules →</a>
-  </div>
+  <h2>Next</h2>
+  <ul>
+    <li><a href="/docs/concepts">Concepts</a> — why that request scored enough to be blocked.</li>
+    <li><a href="/docs/full-stack">Full stack</a> — add the control plane, the dashboard and the node agent.</li>
+  </ul>
 </DocsLayout>

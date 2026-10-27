@@ -1,18 +1,18 @@
 ---
 // SPDX-FileCopyrightText: 2026 0x00spor3
-// SPDX-License-Identifier: BUSL-1.1
+// SPDX-License-Identifier: Apache-2.0
 import Base from "../layouts/Base.astro";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
 import Meter from "../components/Meter.astro";
-import { CORE_REPO } from "../consts";
+import { REPO, CHANGELOG, VERSION } from "../consts";
 
 const protect = [
   { t: "Detection pipeline", d: "SQLi, XSS, RCE, path traversal, SSRF, LDAP/NoSQL/SSTI and more — plus the CRS rule engine — score every request cooperatively." },
   { t: "Cluster-wide rate limiting", d: "One token-bucket budget shared across every node via Redis, with atomic server-side accounting. No node over-allows." },
-  { t: "IP reputation & threat feeds", d: "Score client IPs from your bl&#8203;ocklists; a single-writer feed keeps the shared reputation fresh and self-expiring." },
+  { t: "IP reputation & threat feeds", d: "Score client IPs from your blocklists; a single-writer feed keeps the shared reputation fresh and self-expiring." },
   { t: "Managed TLS", d: "Hitless ACME certificates (TLS-ALPN-01 or DNS-01 wildcards), plus mutual-TLS client auth. Fail-closed, never a silent downgrade." },
-  { t: "Schema enforcement", d: "Validate every GraphQL and gRPC operation against your app's real schema — a field the real client never sends is a probing signal." },
+  { t: "Schema enforcement", d: "Validate every GraphQL, gRPC and REST request against your app's real schema or OpenAPI spec — a route or field the real client never sends is a probing signal." },
   { t: "Signed WASM plugins", d: "Extend detection with your own WASM modules, gated by a detached minisign signature. A plugin that fails verification never loads." },
 ];
 const operate = [
@@ -38,6 +38,7 @@ const govern = [
   <header class="hero">
     <div class="wrap hero-grid">
       <div>
+        <a class="release-note" href={CHANGELOG}><b>v{VERSION}</b> Light WAF is now fully open source →</a>
         <span class="eyebrow">Web Application Firewall</span>
         <h1>Risk accumulates.<br />The <span class="accent">threshold</span> decides.</h1>
         <p class="lede">
@@ -45,12 +46,12 @@ const govern = [
           crosses the line — with a control panel that shows you exactly why.
         </p>
         <div class="hero-cta">
-          <a class="btn btn-primary" href="#features">See what it does</a>
-          <a class="btn btn-ghost" href={CORE_REPO}>Explore the open core</a>
+          <a class="btn btn-primary" href="/docs/quickstart">Get started</a>
+          <a class="btn btn-ghost" href={REPO}>View on GitHub</a>
         </div>
         <div class="hero-meta">
-          <span><i></i>Open core (Apache-2.0)</span>
-          <span class="mono">Rust · zero-fork extension</span>
+          <span><i></i>Open source · Apache-2.0</span>
+          <span class="mono">Rust · self-hosted</span>
         </div>
       </div>
       <Meter />
@@ -95,7 +96,7 @@ const govern = [
       <div class="section-head">
         <span class="eyebrow">Capabilities</span>
         <h2>A firewall, an operations console, and a governance layer.</h2>
-        <p>Everything below the core is opt-in and default-off — turn it all off and you have exactly the standalone OPEN WAF.</p>
+        <p>All of it is open source. Everything beyond the core is opt-in and default-off — turn it all off and you have exactly the standalone core WAF.</p>
       </div>
 
       <div class="feature-group">
@@ -167,21 +168,21 @@ const govern = [
     </div>
   </section>
 
-  <!-- Editions -->
+  <!-- Two ways to run it -->
   <section id="editions">
     <div class="wrap">
       <div class="section-head">
-        <span class="eyebrow">Editions</span>
-        <h2>An open core, extended without forking it.</h2>
-        <p>The enterprise tier plugs into the core's extension seams through the builder — the same physical shape as a separate repository.</p>
+        <span class="eyebrow">Two ways to run it</span>
+        <h2>One node, or a whole fleet. Same project, same license.</h2>
+        <p>Start with the single binary. When you need a shared budget, managed certificates, a dashboard or an audit trail, switch binaries and turn on what you need — nothing to buy, nothing to fork.</p>
       </div>
       <div class="compare">
         <div class="edition">
-          <span class="tag">Apache-2.0 · public</span>
-          <h3>OPEN core</h3>
-          <p>A complete, standalone WAF — on GitHub and crates.io.</p>
+          <span class="tag">waf · crates.io</span>
+          <h3>A single node</h3>
+          <p>The core: a complete, standalone WAF in one binary.</p>
           <ul>
-            <li>Reverse proxy + detection pipeline</li>
+            <li>Reverse proxy + phased detection pipeline</li>
             <li>Native rule modules + CRS engine</li>
             <li>TLS termination from file</li>
             <li>Single-node rate limiting</li>
@@ -189,21 +190,21 @@ const govern = [
           </ul>
         </div>
         <div class="edition ent">
-          <span class="tag">BSL 1.1 · commercial</span>
-          <h3>Enterprise tier</h3>
-          <p>At-scale and governed capabilities on top — available commercially.</p>
+          <span class="tag">waf-enterprise · control plane</span>
+          <h3>At scale</h3>
+          <p>The core plus the components, for a governed fleet.</p>
           <ul>
             <li>Cluster-wide rate limit + IP reputation</li>
-            <li>Managed ACME TLS + curated premium rules</li>
-            <li>GraphQL/gRPC schema enforcement, bot detection</li>
-            <li>control panel, dashboard & governed rule management</li>
-            <li>full request capture, alerting & live dashboard</li>
-            <li>RBAC/SSO, signed audit, compliance & SIEM export</li>
-            <li>Kubernetes-native: Helm charts & WafProxy operator</li>
+            <li>Managed ACME TLS + curated rules</li>
+            <li>GraphQL / gRPC / OpenAPI schema enforcement, bot detection</li>
+            <li>Control plane, dashboard &amp; governed rule management</li>
+            <li>Full request capture, alerting &amp; live dashboard</li>
+            <li>RBAC/SSO, signed audit, compliance &amp; SIEM export</li>
+            <li>Kubernetes-native: Helm charts &amp; WafProxy operator</li>
           </ul>
         </div>
       </div>
-      <a class="seealso" href="/boundary">Where the line is — the full map &amp; the rules that hold it →</a>
+      <a class="seealso" href="/architecture">How the core and the components fit together →</a>
     </div>
   </section>
 
@@ -211,10 +212,10 @@ const govern = [
   <section class="cta">
     <div class="wrap">
       <h2>Run it, tune the threshold, watch the verdicts.</h2>
-      <p>The open core is on GitHub and crates.io. The enterprise tier — control panel, governance, compliance, SIEM — is available commercially.</p>
+      <p>Everything is open source under Apache-2.0 — on GitHub, crates.io and GHCR. Run it, read it, and contribute.</p>
       <div class="hero-cta">
-        <a class="btn btn-primary" href={CORE_REPO}>Explore the open core</a>
-        <a class="btn btn-ghost" href="#dashboard">See the dashboard</a>
+        <a class="btn btn-primary" href="/docs/quickstart">Get started</a>
+        <a class="btn btn-ghost" href={REPO}>View on GitHub</a>
       </div>
     </div>
   </section>

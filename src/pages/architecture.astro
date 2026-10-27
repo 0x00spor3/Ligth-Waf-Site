@@ -1,0 +1,220 @@
+---
+// SPDX-FileCopyrightText: 2026 0x00spor3
+// SPDX-License-Identifier: Apache-2.0
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+import { REPO, repoFile, CORE_CRATES, COMPONENT_CRATES, crateUrl } from "../consts";
+
+// The capability map — grounded in BOUNDARY.md.
+const map = [
+  { area: "Detection & inspection", core: "Every module — SQLi, XSS, RCE, SSRF, … — plus gRPC & GraphQL inspection and the CRS engine.", comp: "Curated rule content; GraphQL, gRPC and OpenAPI schema enforcement; bot detection." },
+  { area: "Rate limiting & state", core: "Single-node L7 token bucket (the StateStore trait + in-memory impl).", comp: "One budget shared across the fleet via Redis, plus IP reputation and threat feeds." },
+  { area: "TLS", core: "Termination from file (rustls, HTTP/1.1 + HTTP/2 via ALPN).", comp: "ACME issuance & hitless rotation, mutual TLS, certificates shared across nodes." },
+  { area: "Rules", core: "seclang / ModSecurity parser + evaluation engine.", comp: "Curated content, and governed publish / rollback with a per-node agent." },
+  { area: "Observability", core: "Prometheus /metrics + a structured JSON decision log.", comp: "Dashboard, retention, blocked-request drill-down, full request capture, alerting." },
+  { area: "Access control", core: "—", comp: "RBAC, SSO (OIDC), server-side sessions, revocable service tokens." },
+  { area: "Audit & compliance", core: "—", comp: "A signed, hash-chained audit log and on-demand SOC2 / PCI evidence bundles." },
+  { area: "SIEM", core: "Raw logs (your own shipper).", comp: "A push forwarder — normalized, at-least-once, with visible lag." },
+  { area: "WASM plugins", core: "The runtime (Proxy-Wasm on wasmi).", comp: "Detached-signature verification before a plugin loads." },
+  { area: "Deployment", core: "Run the waf binary anywhere (systemd, a container).", comp: "Kubernetes-native: Helm charts, a WafProxy operator, GitOps & Gateway API examples." },
+];
+
+const guarantees = [
+  { t: "One-way dependency", d: "Components depend on the core's public API only; the core never depends on a component. A component never forks or patches the core." },
+  { t: "A core that stands alone", d: "The core needs no Redis, no Postgres and no control plane. A single node is fully protected by the waf binary on its own." },
+  { t: "Zero-datapath control plane", d: "The control plane reads telemetry off to the side. It never sits between clients and your backend — it cannot add latency or fail a request." },
+  { t: "Default-off, additive", d: "Every component is opt-in. An empty builder, or a config with every component off, behaves exactly like the core." },
+  { t: "A stable public API", d: "From 1.0 the extension traits, the builder and the config schema follow SemVer, so your own implementations keep building." },
+  { t: "Memory-safe, no OpenSSL", d: "One memory-safe Rust foundation; TLS is rustls. No OpenSSL is linked into any shipped binary." },
+];
+---
+
+<Base
+  title="Architecture — Light WAF core and components"
+  description="How Light WAF is put together: a self-sufficient core that protects a single node, and components that add scale, governance and operability through the core's public extension seams. All Apache-2.0."
+>
+  <Nav />
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="eyebrow">Core ↔ Components</span>
+        <h1>A small core. <span class="accent">Seams</span> for the rest.</h1>
+        <p class="lede">
+          Light WAF is one open-source project in two layers: a core that is the security datapath,
+          and components that run it at scale. Here is where the line sits, and the rules that keep
+          the core small enough to audit.
+        </p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="#map">See the map</a>
+          <a class="btn btn-ghost" href={repoFile("BOUNDARY.md")}>Read BOUNDARY.md</a>
+        </div>
+      </div>
+
+      <div class="callout reveal">
+        <p><b>The core is the security datapath.</b> It must be fully useful on a single node, self-sufficient, and small enough to audit.</p>
+        <p><b>The components add scale, governance and team operability</b> — never baseline detection.</p>
+        <p class="mnemonic">
+          <b>Understanding and inspecting</b> a protocol is core. <b>Running it at scale, with governance</b>, is a component.
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Two promises -->
+  <section id="promises">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Two layers</span>
+        <h2>A complete core, extended by injection.</h2>
+      </div>
+      <div class="two-col">
+        <div class="panel-block">
+          <h3>The core is complete on its own</h3>
+          <p>Every detection module lives in the core, <em>including</em> gRPC and GraphQL inspection. A single node runs standalone: proxy, phased pipeline, normalization, anomaly scoring, TLS from file, single-node rate limiting, config and hot reload.</p>
+        </div>
+        <div class="panel-block">
+          <h3>The components are additive</h3>
+          <p>Every component plugs into a public trait through the embedding builder. The <span class="mono">waf-enterprise</span> binary is the core with every component wired in — turn each one off and you have exactly the <span class="mono">waf</span> binary's behavior.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Capability map -->
+  <section id="map">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">The capability map</span>
+        <h2>What the core does, what the components add.</h2>
+        <p>Read it as: the core gives you the whole datapath; the components add scale, governance and evidence around it. Both are Apache-2.0.</p>
+      </div>
+      <div class="map">
+        <table>
+          <thead>
+            <tr>
+              <th>Area</th>
+              <th>Core · waf</th>
+              <th class="col-ent">Components add · waf-enterprise</th>
+            </tr>
+          </thead>
+          <tbody>
+            {map.map((r) => (
+              <tr>
+                <td class="area">{r.area}</td>
+                <td class="open">{r.core}</td>
+                <td class="ent">{r.comp}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- The seams -->
+  <section id="seams">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">The seams</span>
+        <h2>The components use public doors — the same ones you can.</h2>
+        <p>For every component, the core defines a public trait; the component provides an implementation and injects it through the builder. Nothing is patched into the core.</p>
+      </div>
+      <pre class="code"><span class="c">// embed the core as a library and inject implementations of its public traits</span>
+<span class="p">let</span> store = RedisStore::connect_with_options(&amp;url, RedisStoreOptions::default())?;
+<span class="p">let</span> proxy = Proxy::builder(&amp;config)
+    .state_store(Arc::new(store))                       <span class="c">// StateStore</span>
+    .cert_source(Arc::new(AcmeCertSource::new(..)))     <span class="c">// TlsCertSource</span>
+    .module_factory(move || build_modules(&amp;cfg))        <span class="c">// WafModules, rebuilt on every reload</span>
+    .build().await?;
+
+<span class="c">// every seam has a default → an empty builder equals the plain waf proxy.</span></pre>
+      <p class="muted" style="margin-top:1rem;max-width:70ch">
+        <span class="mono">StateStore</span>, <span class="mono">TlsCertSource</span> and <span class="mono">WafModule</span> are public traits. The components implement them — and so can you. If a module fails to rebuild on a SIGHUP reload, the reload is aborted and the last-good modules stay active.
+      </p>
+    </div>
+  </section>
+
+  <!-- Guarantees -->
+  <section id="rules">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">The rules that hold the line</span>
+        <h2>Properties you can rely on.</h2>
+        <p>The boundary is a written, normative policy in the repository — these are the parts that matter when you deploy it.</p>
+      </div>
+      <div class="feature-grid">
+        {guarantees.map((g) => (
+          <div class="feature">
+            <h3>{g.t}</h3>
+            <p>{g.d}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Crates -->
+  <section id="crates">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">One workspace</span>
+        <h2>Fourteen crates on crates.io, one version.</h2>
+        <p>Core and components ship together on the same version. The control plane, governance, node agent and operator are shipped as container images and Helm charts instead.</p>
+      </div>
+      <div class="compare">
+        <div class="edition">
+          <span class="tag">Core</span>
+          <h3>The datapath</h3>
+          <ul>
+            {CORE_CRATES.map((c) => <li><a href={crateUrl(c.name)}><span class="mono">{c.name}</span></a></li>)}
+          </ul>
+        </div>
+        <div class="edition ent">
+          <span class="tag">Components</span>
+          <h3>At scale</h3>
+          <ul>
+            {COMPONENT_CRATES.map((c) => <li><a href={crateUrl(c.name)}><span class="mono">{c.name}</span></a></li>)}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Licensing -->
+  <section id="licensing">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Licensing</span>
+        <h2>One license for everything.</h2>
+        <p>The core, the components, the control plane, the charts and the operator are all <b>Apache-2.0</b> — permissive, with an explicit patent grant. Use it, embed it, run it as a service.</p>
+      </div>
+      <div class="two-col">
+        <div class="panel-block">
+          <h3>Contributions</h3>
+          <p>Contributions are accepted under the same license, with a Developer Certificate of Origin sign-off (<span class="mono">git commit -s</span>) — no CLA to sign.</p>
+        </div>
+        <div class="panel-block">
+          <h3>The name</h3>
+          <p>The license covers the code, not the name (Apache-2.0 §6): fork it freely, but don't present a fork as Light WAF itself.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="wrap">
+      <h2>Start with one node. Grow into the rest.</h2>
+      <p>Run the core today; turn on the components when a fleet and an audit ask for them.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="/docs/quickstart">Get started</a>
+        <a class="btn btn-ghost" href={REPO}>View on GitHub</a>
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+</Base>

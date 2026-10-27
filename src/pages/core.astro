@@ -1,10 +1,10 @@
 ---
 // SPDX-FileCopyrightText: 2026 0x00spor3
-// SPDX-License-Identifier: BUSL-1.1
+// SPDX-License-Identifier: Apache-2.0
 import Base from "../layouts/Base.astro";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
-import { CORE_REPO, CRATES } from "../consts";
+import { REPO, CORE_CRATES, crateUrl } from "../consts";
 
 // Content detection modules (the CRS-style rule modules). Structural GraphQL/gRPC validation and
 // L7 rate limiting are called out separately below.
@@ -26,8 +26,8 @@ const beyond = [
 ---
 
 <Base
-  title="Light WAF Core — the open engine"
-  description="The open-core reverse-proxy WAF in Rust: Layer-7 inspection, anomaly scoring, and a verdict in under a millisecond. Apache-2.0, on GitHub and crates.io."
+  title="Light WAF Core — the engine underneath"
+  description="The Light WAF core: a reverse-proxy WAF in Rust with Layer-7 inspection, anomaly scoring, and a verdict in under a millisecond. Apache-2.0, on GitHub and crates.io."
 >
   <Nav />
 
@@ -35,15 +35,15 @@ const beyond = [
   <header class="hero">
     <div class="wrap hero-grid">
       <div>
-        <span class="eyebrow">Open core · Apache-2.0</span>
-        <h1>The open engine <span class="accent">underneath</span>.</h1>
+        <span class="eyebrow">The core · Apache-2.0</span>
+        <h1>The engine <span class="accent">underneath</span>.</h1>
         <p class="lede">
           A reverse-proxy web application firewall in Rust. It inspects every request at Layer 7,
           accumulates an anomaly score, and returns a verdict — in under a millisecond on the common
           path. Complete and standalone on its own.
         </p>
         <div class="hero-cta">
-          <a class="btn btn-primary" href={CORE_REPO}>Core on GitHub</a>
+          <a class="btn btn-primary" href="/docs/quickstart">Get started</a>
           <a class="btn btn-ghost" href="#crates">Browse the crates</a>
         </div>
         <div class="hero-meta">
@@ -187,11 +187,11 @@ const beyond = [
       <div class="two-col">
         <div class="panel-block">
           <h3>Observability</h3>
-          <p>Prometheus <span class="mono">/metrics</span> and a structured JSON decision log — including the per-rule score contributions behind every verdict. This is the exact contract the enterprise control plane consumes.</p>
+          <p>Prometheus <span class="mono">/metrics</span> and a structured JSON decision log — including the per-rule score contributions behind every verdict. This is the exact contract the control plane consumes.</p>
         </div>
         <div class="panel-block">
           <h3>Extension seams</h3>
-          <p>A builder wires in typed seams — the distributed <span class="mono">StateStore</span>, the <span class="mono">TlsCertSource</span> — and a WASM plugin runtime (Proxy-Wasm on <span class="mono">wasmi</span>) loads your own modules. The enterprise tier plugs in here, without touching the core.</p>
+          <p>A builder wires in typed seams — the distributed <span class="mono">StateStore</span>, the <span class="mono">TlsCertSource</span> — and a WASM plugin runtime (Proxy-Wasm on <span class="mono">wasmi</span>) loads your own modules. The at-scale components plug in here, without touching the core.</p>
         </div>
       </div>
     </div>
@@ -202,12 +202,12 @@ const beyond = [
     <div class="wrap">
       <div class="section-head">
         <span class="eyebrow">On crates.io</span>
-        <h2>Six crates, one workspace.</h2>
-        <p>The core is published to crates.io — build against the pieces you need, or run the proxy binary directly.</p>
+        <h2>Six core crates.</h2>
+        <p>The core is published to crates.io — build against the pieces you need, or run the proxy binary directly. The <a href="/architecture#crates">at-scale components</a> ship alongside, on the same version.</p>
       </div>
       <div class="crates">
-        {CRATES.map((c) => (
-          <a class="crate" href={c.url}>
+        {CORE_CRATES.map((c) => (
+          <a class="crate" href={crateUrl(c.name)}>
             <span class="cname">{c.name}<span class="arr">↗</span></span>
             <p>{c.blurb}</p>
           </a>
@@ -232,7 +232,7 @@ const beyond = [
 <span class="p">$</span> waf --config config.toml
 
 <span class="c"># …or build from source</span>
-<span class="p">$</span> git clone {CORE_REPO}
+<span class="p">$</span> git clone {REPO}
 <span class="p">$</span> cd Light-WAF && cargo run -p waf-proxy -- --config config.toml</pre>
         </div>
         <div class="panel-block">
@@ -256,8 +256,8 @@ block_threshold = 5</pre>
       <h2>Read it, run it, extend it.</h2>
       <p>The whole engine is open source under Apache-2.0. Star it, file issues, or build a plugin.</p>
       <div class="hero-cta">
-        <a class="btn btn-primary" href={CORE_REPO}>Core on GitHub</a>
-        <a class="btn btn-ghost" href="/#dashboard">See the enterprise control plane</a>
+        <a class="btn btn-primary" href={REPO}>View on GitHub</a>
+        <a class="btn btn-ghost" href="/scale">Run it at scale</a>
       </div>
     </div>
   </section>

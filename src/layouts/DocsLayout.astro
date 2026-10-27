@@ -1,18 +1,27 @@
 ---
 // SPDX-FileCopyrightText: 2026 0x00spor3
-// SPDX-License-Identifier: BUSL-1.1
+// SPDX-License-Identifier: Apache-2.0
 import Base from "./Base.astro";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
 import { DOCS_NAV } from "../consts";
 
 interface Props {
-  title: string;
+  title?: string;
   description?: string;
+  /** Set when the page is Markdown (`layout:` in its frontmatter). */
+  frontmatter?: { title: string; description?: string };
 }
-const { title, description } = Astro.props;
+// .astro pages pass title/description as props; Markdown pages pass them in `frontmatter`.
+const { title, description } = Astro.props.frontmatter ?? Astro.props;
 // Normalize trailing slashes so "/docs/" and "/docs" both match.
 const path = Astro.url.pathname.replace(/\/$/, "") || "/";
+
+// Previous/next page, in left-nav order.
+const flat = DOCS_NAV.flatMap((g) => g.items);
+const at = flat.findIndex((it) => it.href === path);
+const prev = at > 0 ? flat[at - 1] : undefined;
+const next = at >= 0 && at < flat.length - 1 ? flat[at + 1] : undefined;
 ---
 
 <Base title={`${title} — Light WAF docs`} description={description}>
@@ -35,6 +44,14 @@ const path = Astro.url.pathname.replace(/\/$/, "") || "/";
     <main class="docs-main">
       <article class="prose">
         <slot />
+        {
+          (prev || next) && (
+            <div class="doc-next">
+              {prev && <a class="btn btn-ghost" href={prev.href}>← {prev.label}</a>}
+              {next && <a class="btn btn-ghost" href={next.href}>{next.label} →</a>}
+            </div>
+          )
+        }
       </article>
     </main>
   </div>

@@ -1,7 +1,7 @@
 /* SPDX-FileCopyrightText: 2026 0x00spor3
-   SPDX-License-Identifier: BUSL-1.1
+   SPDX-License-Identifier: Apache-2.0
 
-   Light WAF marketing site — same "The Threshold" identity as the control-plane dashboard:
+   Light WAF site — same "The Threshold" identity as the control-plane dashboard:
    layered slate surfaces, a single teal signal accent reserved for the brand (verdicts keep their own
    tri-color semantics), Space Grotesk display + IBM Plex Sans/Mono, and the Verdict Meter as the
    signature. More atmospheric here than in the dense dashboard; the boldness stays in the hero meter. */
@@ -34,6 +34,19 @@
   --font-display: "Space Grotesk Variable", "Space Grotesk", system-ui, sans-serif;
   --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Shiki "css-variables" theme (Markdown code blocks in the docs) → the site palette. */
+  --astro-code-foreground: var(--ink);
+  --astro-code-background: var(--void);
+  --astro-code-token-comment: var(--ink-faint);
+  --astro-code-token-keyword: var(--signal);
+  --astro-code-token-string: #b9c7e0;
+  --astro-code-token-string-expression: #b9c7e0;
+  --astro-code-token-constant: var(--signal-2);
+  --astro-code-token-function: var(--signal-2);
+  --astro-code-token-parameter: var(--ink);
+  --astro-code-token-punctuation: var(--ink-dim);
+  --astro-code-token-link: var(--signal);
 
   color-scheme: dark;
 }
@@ -584,7 +597,8 @@ footer {
 }
 .foot-inner .foot-links {
   display: flex;
-  gap: 1.2rem;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.2rem;
   margin-left: auto;
 }
 .foot-inner .foot-links a {
@@ -697,6 +711,10 @@ footer {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.1rem;
+}
+/* let code blocks scroll inside the column instead of widening the grid on narrow screens */
+.two-col > * {
+  min-width: 0;
 }
 .panel-block {
   background: var(--surface);
@@ -931,7 +949,9 @@ footer {
   grid-template-columns: 236px 1fr;
   gap: 3rem;
   align-items: start;
-  padding: 2.75rem 0 4.5rem;
+  /* vertical only — the horizontal gutter comes from .wrap */
+  padding-top: 2.75rem;
+  padding-bottom: 4.5rem;
 }
 .docs-side {
   position: sticky;
@@ -1047,6 +1067,105 @@ footer {
 .prose .callout p {
   font-size: 0.98rem;
 }
+/* Markdown docs: code blocks, tables, ordered lists and notes rendered from .md pages */
+.prose pre.astro-code {
+  background: var(--void) !important;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.2rem;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+.prose pre.astro-code code {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+.prose ol {
+  padding-left: 1.4rem;
+  margin: 0.7rem 0;
+}
+.prose ol li {
+  margin: 0.35rem 0;
+  line-height: 1.6;
+}
+.prose > table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.2rem 0;
+  font-size: 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+.prose > table th,
+.prose > table td {
+  text-align: left;
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+.prose > table thead th {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  background: var(--surface-2);
+  white-space: nowrap;
+}
+.prose > table tbody tr:last-child td {
+  border-bottom: none;
+}
+.prose blockquote {
+  margin: 1.2rem 0;
+  padding: 0.8rem 1.1rem;
+  border-left: 3px solid var(--signal);
+  background: var(--signal-faint);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.prose blockquote p {
+  margin: 0.3rem 0;
+}
+.prose hr {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 2rem 0;
+}
+
+/* Release banner above the home hero */
+.release-note {
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 1.2rem;
+  padding: 0.32rem 0.8rem 0.32rem 0.4rem;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 0.85rem;
+  color: var(--ink-dim);
+}
+.release-note b {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--void);
+  background: var(--signal);
+  border-radius: 999px;
+  padding: 0.1rem 0.5rem;
+}
+.release-note:hover {
+  color: var(--ink);
+  border-color: var(--signal);
+}
+
 .doc-next {
   display: flex;
   gap: 1rem;
@@ -1059,6 +1178,11 @@ footer {
   .docs {
     grid-template-columns: 1fr;
     gap: 1.5rem;
+  }
+  /* narrow screens: let wide Markdown tables scroll instead of overflowing the page */
+  .prose > table {
+    display: block;
+    overflow-x: auto;
   }
   .docs-side {
     position: static;
