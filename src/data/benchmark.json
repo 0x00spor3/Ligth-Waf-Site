@@ -1,0 +1,1354 @@
+{
+  "env": {
+    "run_id": "20261028T214810Z",
+    "rate": "250",
+    "connections": "64",
+    "duration": "30s",
+    "warmup": "5s",
+    "waf_cpus": "0-1",
+    "backend_cpus": "2",
+    "loadgen_cpus": "3-5",
+    "docker": "29.9.2 linux/amd64",
+    "host_cpus": "16",
+    "host_mem_bytes": "16728870912",
+    "kernel": "6.18.54.1-microsoft-standard-WSL2",
+    "os": "Docker Desktop",
+    "cpu_model": "AMD Ryzen 7 5800X 8-Core Processor",
+    "image.backend": "nginx:1.27.5-alpine sha256:6769dc3a703c719c1d2756bda113659be28ae16cf0da58dd5fd823d6b9a050ea",
+    "image.lightwaf": "ghcr.io/0x00spor3/waf-enterprise:1.0.1 sha256:0d1e085d70e9999c1481f641eb2c414bf031d5dabfad80cbaabc2c540275e1c9",
+    "image.lightwaf-strict": "ghcr.io/0x00spor3/waf-enterprise:1.0.1 sha256:0d1e085d70e9999c1481f641eb2c414bf031d5dabfad80cbaabc2c540275e1c9",
+    "image.modsec-pl1": "owasp/modsecurity-crs:4.30.0-nginx-202610051210 sha256:c771ea3ed89693745988aca1987f4383d9fa5567388d59f2e80388c314515fe3",
+    "image.modsec-pl2": "owasp/modsecurity-crs:4.30.0-nginx-202610051210 sha256:c771ea3ed89693745988aca1987f4383d9fa5567388d59f2e80388c314515fe3",
+    "image.modsec-strict": "owasp/modsecurity-crs:4.30.0-nginx-202610051210 sha256:c771ea3ed89693745988aca1987f4383d9fa5567388d59f2e80388c314515fe3",
+    "image.loadgen": "ghcr.io/hatoo/oha:1.16.0 sha256:829061114b8759bce37b3d00a62c4de99476c2d4b92fe01cbca1926cd827f077",
+    "image.gotestwaf": "wallarm/gotestwaf:0.5.8 sha256:1f8556919f24621b8bba0e46b9aa456abdebc72c1b03d103af9cecf6f95ea779"
+  },
+  "perf": {
+    "direct": {
+      "attack": {
+        "fixed": {
+          "rps": 250.02334913426412,
+          "success_rate": 1.0,
+          "p50_ms": 0.130489,
+          "p90_ms": 0.153222,
+          "p99_ms": 0.241953,
+          "p999_ms": 0.444161,
+          "status_codes": {
+            "200": 7500
+          },
+          "errors": {
+            "aborted due to deadline": 1
+          }
+        },
+        "max": {
+          "rps": 51130.50568027455,
+          "success_rate": 1.0,
+          "p50_ms": 1.2353049999999999,
+          "p90_ms": 1.3358599999999998,
+          "p99_ms": 1.694792,
+          "p999_ms": 2.394283,
+          "status_codes": {
+            "200": 1534002
+          },
+          "errors": {
+            "aborted due to deadline": 61
+          }
+        }
+      },
+      "clean-get": {
+        "fixed": {
+          "rps": 250.04671221389654,
+          "success_rate": 1.0,
+          "p50_ms": 0.13174,
+          "p90_ms": 0.157189,
+          "p99_ms": 0.267869,
+          "p999_ms": 0.422884,
+          "status_codes": {
+            "200": 7500
+          },
+          "errors": {
+            "aborted due to deadline": 2
+          }
+        },
+        "max": {
+          "rps": 50397.1441612576,
+          "success_rate": 1.0,
+          "p50_ms": 1.253484,
+          "p90_ms": 1.366578,
+          "p99_ms": 1.672219,
+          "p999_ms": 2.495044,
+          "status_codes": {
+            "200": 1512029
+          },
+          "errors": {
+            "aborted due to deadline": 64
+          }
+        }
+      },
+      "clean-post": {
+        "fixed": {
+          "rps": 250.0210961591243,
+          "success_rate": 1.0,
+          "p50_ms": 0.13053800000000002,
+          "p90_ms": 0.149144,
+          "p99_ms": 0.233383,
+          "p999_ms": 0.497355,
+          "status_codes": {
+            "200": 7500
+          },
+          "errors": {
+            "aborted due to deadline": 1
+          }
+        },
+        "max": {
+          "rps": 50021.89251797807,
+          "success_rate": 1.0,
+          "p50_ms": 1.2229160000000001,
+          "p90_ms": 1.3730019999999998,
+          "p99_ms": 2.407459,
+          "p999_ms": 2.881157,
+          "status_codes": {
+            "200": 1500751
+          },
+          "errors": {
+            "aborted due to deadline": 63
+          }
+        }
+      }
+    },
+    "lightwaf-strict": {
+      "attack": {
+        "fixed": {
+          "rps": 250.0497909229672,
+          "success_rate": 1.0,
+          "p50_ms": 0.22211799999999998,
+          "p90_ms": 0.26414,
+          "p99_ms": 0.433715,
+          "p999_ms": 0.695621,
+          "status_codes": {
+            "403": 7500
+          },
+          "errors": {
+            "aborted due to deadline": 2
+          }
+        },
+        "max": {
+          "rps": 20235.024534321667,
+          "success_rate": 1.0,
+          "p50_ms": 3.2234260000000003,
+          "p90_ms": 4.370662,
+          "p99_ms": 5.397837,
+          "p999_ms": 7.0805929999999995,
+          "status_codes": {
+            "403": 607068
+          },
+          "errors": {
+            "aborted due to deadline": 62
+          }
+        }
+      },
+      "clean-get": {
+        "fixed": {
+          "rps": 250.05729473597628,
+          "success_rate": 1.0,
+          "p50_ms": 0.356838,
+          "p90_ms": 0.39722599999999997,
+          "p99_ms": 0.6642819999999999,
+          "p999_ms": 1.055418,
+          "status_codes": {
+            "200": 7500
+          },
+          "errors": {
+            "aborted due to deadline": 2
+          }
+        },
+        "max": {
+          "rps": 13655.616682627828,
+          "success_rate": 1.0,
+          "p50_ms": 4.688046000000001,
+          "p90_ms": 5.889122,
+          "p99_ms": 7.328951999999999,
+          "p999_ms": 10.296588,
+          "status_codes": {
+            "200": 409654
+          },
+          "errors": {
+            "aborted due to deadline": 64
+          }
+        }
+      },
+      "clean-post": {
+        "fixed": {
+          "rps": 250.02006253510203,
+          "success_rate": 1.0,
+          "p50_ms": 0.406886,
+          "p90_ms": 0.44721099999999997,
+          "p99_ms": 0.6949420000000001,
+          "p999_ms": 1.041341,
+          "status_codes": {
+            "200": 7500
+          },
+          "errors": {
+            "aborted due to deadline": 1
+          }
+        },
+        "max": {
+          "rps": 12152.682388545474,
+          "success_rate": 1.0,
+          "p50_ms": 5.226793000000001,
+          "p90_ms": 6.6814789999999995,
+          "p99_ms": 8.097574999999999,
+          "p999_ms": 11.150813000000001,
+          "status_codes": {
+            "200": 364549
+          },
+          "errors": {
+            "aborted due to deadline": 64
+          }
+        }
+      },
+      "memory": "25.85MiB"
+    },
+    "lightwaf": {
+      "attack": {
+        "fixed": {
+          "rps": 250.0168765808068,
+          "success_rate": 1.0,
+          "p50_ms": 0.215703,
+          "p90_ms": 0.255014,
+          "p99_ms": 0.45236400000000004,
+          "p999_ms": 0.766454,
+          "status_codes": {
+            "403": 7500
+          },
+          "errors": {
+            "aborted due to deadline": 1
+          }
+        },
+        "max": {
+          "rps": 20396.95206958977,
+          "success_rate": 1.0,
+          "p50_ms": 3.196051,
+          "p90_ms": 4.333253,
+          "p99_ms": 5.341928,
+          "p999_ms": 7.200162000000001,
+          "status_codes": {
+            "403": 611913
+          },
+          "errors": {
+            "aborted due to deadline": 63
+          }
+        }
+      },
+      "clean-get": {
+        "fixed": {
+          "rps": 250.0162026231555,
+          "success_rate": 1.0,
+          "p50_ms": 0.354564,
+          "p90_ms": 0.386374,
+          "p99_ms": 0.564729,
+          "p999_ms": 0.899741,
+          "status_codes": {
+            "200": 7500
+          },
+          "errors": {
+            "aborted due to deadline": 1
+          }
+        },
+        "max": {
+          "rps": 14054.87768361008,
+          "success_rate": 1.0,
+          "p50_ms": 4.5729869999999995,
+          "p90_ms": 5.7030780000000005,
+          "p99_ms": 6.687492,
+          "p999_ms": 9.476101,
+          "status_codes": {
+            "200": 421605
+          },
+          "errors": {
+            "aborted due to deadline": 64
+          }
+        }
+      },
+      "clean-post": {
+        "fixed": {
+          "rps": 250.01656479733734,
+          "success_rate": 1.0,
+          "p50_ms": 0.40486,
+          "p90_ms": 0.446139,
+          "p99_ms": 0.6239859999999999,
+          "p999_ms": 0.992347,
+          "status_codes": {
+            "200": 7500
+          },
+          "errors": {
+            "aborted due to deadline": 1
+          }
+        },
+        "max": {
+          "rps": 12331.527011070995,
+          "success_rate": 1.0,
+          "p50_ms": 5.1576900000000006,
+          "p90_ms": 6.575875,
+          "p99_ms": 7.8721369999999995,
+          "p999_ms": 10.746779,
+          "status_codes": {
+            "200": 369924
+          },
+          "errors": {
+            "aborted due to deadline": 63
+          }
+        }
+      },
+      "memory": "20.77MiB"
+    },
+    "modsec-pl1": {
+      "attack": {
+        "fixed": {
+          "rps": 250.0225410686777,
+          "success_rate": 1.0,
+          "p50_ms": 1.453123,
+          "p90_ms": 1.725848,
+          "p99_ms": 2.324964,
+          "p999_ms": 3.9466509999999997,
+          "status_codes": {
+            "403": 7500
+          },
+          "errors": {
+            "aborted due to deadline": 1
+          }
+        },
+        "max": {
+          "rps": 1305.244286135744,
+          "success_rate": 1.0,
+          "p50_ms": 36.32349,
+          "p90_ms": 98.77697500000001,
+          "p99_ms": 138.53664500000002,
+          "p999_ms": 175.030519,
+          "status_codes": {
+            "403": 39097
+          },
+          "errors": {
+            "aborted due to deadline": 64
+          }
+        }
+      },
+      "clean-get": {
+        "fixed": {
+          "rps": 250.01276414986106,
+          "success_rate": 1.0,
+          "p50_ms": 1.757817,
+          "p90_ms": 2.034962,
+          "p99_ms": 2.817166,
+          "p999_ms": 4.011059,
+          "status_codes": {
+            "200": 7500
+          },
+          "errors": {
+            "aborted due to deadline": 1
+          }
+        },
+        "max": {
+          "rps": 1120.3180683762084,
+          "success_rate": 1.0,
+          "p50_ms": 46.75854,
+          "p90_ms": 108.192577,
+          "p99_ms": 154.281757,
+          "p999_ms": 184.204916,
+          "status_codes": {
+            "200": 33548
+          },
+          "errors": {
+            "aborted due to deadline": 64
+          }
+        }
+      },
+      "clean-post": {
+        "fixed": {
+          "rps": 249.96666624514955,
+          "success_rate": 1.0,
+          "p50_ms": 2.824672,
+          "p90_ms": 3.230277,
+          "p99_ms": 7.425682999999999,
+          "p999_ms": 16.818495,
+          "status_codes": {
+            "200": 7485
+          },
+          "errors": {
+            "aborted due to deadline": 15
+          }
+        },
+        "max": {
+          "rps": 643.7549549637063,
+          "success_rate": 1.0,
+          "p50_ms": 79.498802,
+          "p90_ms": 183.082978,
+          "p99_ms": 261.900213,
+          "p999_ms": 298.631029,
+          "status_codes": {
+            "200": 19250
+          },
+          "errors": {
+            "aborted due to deadline": 64
+          }
+        }
+      },
+      "memory": "102.8MiB"
+    },
+    "modsec-pl2": {
+      "attack": {
+        "fixed": {
+          "rps": 250.01935930130716,
+          "success_rate": 1.0,
+          "p50_ms": 2.1205220000000002,
+          "p90_ms": 2.625073,
+          "p99_ms": 4.310601,
+          "p999_ms": 7.883756000000001,
+          "status_codes": {
+            "403": 7500
+          },
+          "errors": {
+            "aborted due to deadline": 1
+          }
+        },
+        "max": {
+          "rps": 856.9312097614434,
+          "success_rate": 1.0,
+          "p50_ms": 74.478122,
+          "p90_ms": 148.393462,
+          "p99_ms": 182.49953399999998,
+          "p999_ms": 212.38825,
+          "status_codes": {
+            "403": 25646
+          },
+          "errors": {
+            "aborted due to deadline": 64
+          }
+        }
+      },
+      "clean-get": {
+        "fixed": {
+          "rps": 250.01634395604472,
+          "success_rate": 1.0,
+          "p50_ms": 2.401993,
+          "p90_ms": 2.795477,
+          "p99_ms": 3.8070019999999998,
+          "p999_ms": 14.891796000000001,
+          "status_codes": {
+            "200": 7500
+          },
+          "errors": {
+            "aborted due to deadline": 1
+          }
+        },
+        "max": {
+          "rps": 800.34219608523,
+          "success_rate": 1.0,
+          "p50_ms": 55.805161999999996,
+          "p90_ms": 162.254798,
+          "p99_ms": 213.780357,
+          "p999_ms": 252.56591699999998,
+          "status_codes": {
+            "200": 23948
+          },
+          "errors": {
+            "aborted due to deadline": 64
+          }
+        }
+      },
+      "clean-post": {
+        "fixed": {
+          "rps": 250.01414177278397,
+          "success_rate": 1.0,
+          "p50_ms": 4.498012,
+          "p90_ms": 8.441073000000001,
+          "p99_ms": 13.072967,
+          "p999_ms": 25.604353,
+          "status_codes": {
+            "200": 7500
+          },
+          "errors": {
+            "aborted due to deadline": 1
+          }
+        },
+        "max": {
+          "rps": 439.9663945308496,
+          "success_rate": 1.0,
+          "p50_ms": 166.68908800000003,
+          "p90_ms": 282.850557,
+          "p99_ms": 344.155557,
+          "p999_ms": 397.401286,
+          "status_codes": {
+            "200": 13136
+          },
+          "errors": {
+            "aborted due to deadline": 64
+          }
+        }
+      },
+      "memory": "103.1MiB"
+    }
+  },
+  "gotestwaf": {
+    "lightwaf-strict": {
+      "score": 98.98,
+      "tp_score": 96,
+      "tp_blocked": 648,
+      "tp_sent": 675,
+      "tp_unresolved": 0,
+      "tn_score": 100,
+      "tn_passed": 141,
+      "tn_sent": 141,
+      "cases": {
+        "community/community-128kb-rce": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-128kb-sqli": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-128kb-xss": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-16kb-rce": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-16kb-sqli": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-16kb-xss": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-32kb-rce": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-32kb-sqli": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-32kb-xss": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-64kb-rce": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-64kb-sqli": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-64kb-xss": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-8kb-rce": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-8kb-sqli": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-8kb-xss": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-lfi": {
+          "blocked": 8,
+          "sent": 8
+        },
+        "community/community-lfi-multipart": {
+          "blocked": 0,
+          "sent": 2
+        },
+        "community/community-rce": {
+          "blocked": 4,
+          "sent": 4
+        },
+        "community/community-rce-rawrequests": {
+          "blocked": 3,
+          "sent": 3
+        },
+        "community/community-sqli": {
+          "blocked": 12,
+          "sent": 12
+        },
+        "community/community-user-agent": {
+          "blocked": 9,
+          "sent": 9
+        },
+        "community/community-xss": {
+          "blocked": 99,
+          "sent": 104
+        },
+        "community/community-xxe": {
+          "blocked": 2,
+          "sent": 2
+        },
+        "owasp/crlf": {
+          "blocked": 6,
+          "sent": 7
+        },
+        "owasp/ldap-injection": {
+          "blocked": 22,
+          "sent": 24
+        },
+        "owasp/mail-injection": {
+          "blocked": 20,
+          "sent": 24
+        },
+        "owasp/nosql-injection": {
+          "blocked": 50,
+          "sent": 50
+        },
+        "owasp/path-traversal": {
+          "blocked": 20,
+          "sent": 20
+        },
+        "owasp/rce": {
+          "blocked": 6,
+          "sent": 6
+        },
+        "owasp/rce-urlparam": {
+          "blocked": 9,
+          "sent": 9
+        },
+        "owasp/rce-urlpath": {
+          "blocked": 3,
+          "sent": 3
+        },
+        "owasp/shell-injection": {
+          "blocked": 32,
+          "sent": 32
+        },
+        "owasp/sql-injection": {
+          "blocked": 45,
+          "sent": 48
+        },
+        "owasp/ss-include": {
+          "blocked": 24,
+          "sent": 24
+        },
+        "owasp/sst-injection": {
+          "blocked": 24,
+          "sent": 24
+        },
+        "owasp/xml-injection": {
+          "blocked": 7,
+          "sent": 7
+        },
+        "owasp/xss-scripting": {
+          "blocked": 214,
+          "sent": 224
+        },
+        "owasp-api/non-crud": {
+          "blocked": 2,
+          "sent": 2
+        },
+        "owasp-api/rest": {
+          "blocked": 7,
+          "sent": 7
+        },
+        "owasp-api/soap": {
+          "blocked": 5,
+          "sent": 5
+        }
+      }
+    },
+    "lightwaf": {
+      "score": 65.72,
+      "tp_score": 76.44,
+      "tp_blocked": 516,
+      "tp_sent": 675,
+      "tp_unresolved": 0,
+      "tn_score": 100,
+      "tn_passed": 141,
+      "tn_sent": 141,
+      "cases": {
+        "community/community-128kb-rce": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-128kb-sqli": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-128kb-xss": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-16kb-rce": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-16kb-sqli": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-16kb-xss": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-32kb-rce": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-32kb-sqli": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-32kb-xss": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-64kb-rce": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-64kb-sqli": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-64kb-xss": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-8kb-rce": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-8kb-sqli": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-8kb-xss": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-lfi": {
+          "blocked": 8,
+          "sent": 8
+        },
+        "community/community-lfi-multipart": {
+          "blocked": 0,
+          "sent": 2
+        },
+        "community/community-rce": {
+          "blocked": 4,
+          "sent": 4
+        },
+        "community/community-rce-rawrequests": {
+          "blocked": 2,
+          "sent": 3
+        },
+        "community/community-sqli": {
+          "blocked": 12,
+          "sent": 12
+        },
+        "community/community-user-agent": {
+          "blocked": 9,
+          "sent": 9
+        },
+        "community/community-xss": {
+          "blocked": 82,
+          "sent": 104
+        },
+        "community/community-xxe": {
+          "blocked": 2,
+          "sent": 2
+        },
+        "owasp/crlf": {
+          "blocked": 6,
+          "sent": 7
+        },
+        "owasp/ldap-injection": {
+          "blocked": 22,
+          "sent": 24
+        },
+        "owasp/mail-injection": {
+          "blocked": 20,
+          "sent": 24
+        },
+        "owasp/nosql-injection": {
+          "blocked": 20,
+          "sent": 50
+        },
+        "owasp/path-traversal": {
+          "blocked": 20,
+          "sent": 20
+        },
+        "owasp/rce": {
+          "blocked": 6,
+          "sent": 6
+        },
+        "owasp/rce-urlparam": {
+          "blocked": 9,
+          "sent": 9
+        },
+        "owasp/rce-urlpath": {
+          "blocked": 3,
+          "sent": 3
+        },
+        "owasp/shell-injection": {
+          "blocked": 24,
+          "sent": 32
+        },
+        "owasp/sql-injection": {
+          "blocked": 45,
+          "sent": 48
+        },
+        "owasp/ss-include": {
+          "blocked": 24,
+          "sent": 24
+        },
+        "owasp/sst-injection": {
+          "blocked": 24,
+          "sent": 24
+        },
+        "owasp/xml-injection": {
+          "blocked": 7,
+          "sent": 7
+        },
+        "owasp/xss-scripting": {
+          "blocked": 146,
+          "sent": 224
+        },
+        "owasp-api/non-crud": {
+          "blocked": 2,
+          "sent": 2
+        },
+        "owasp-api/rest": {
+          "blocked": 3,
+          "sent": 7
+        },
+        "owasp-api/soap": {
+          "blocked": 1,
+          "sent": 5
+        }
+      }
+    },
+    "modsec-pl1": {
+      "score": 63.52,
+      "tp_score": 49.19,
+      "tp_blocked": 332,
+      "tp_sent": 675,
+      "tp_unresolved": 0,
+      "tn_score": 90.78,
+      "tn_passed": 128,
+      "tn_sent": 141,
+      "cases": {
+        "community/community-128kb-rce": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-128kb-sqli": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-128kb-xss": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-16kb-rce": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-16kb-sqli": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-16kb-xss": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-32kb-rce": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-32kb-sqli": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-32kb-xss": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-64kb-rce": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-64kb-sqli": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-64kb-xss": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-8kb-rce": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-8kb-sqli": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-8kb-xss": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-lfi": {
+          "blocked": 8,
+          "sent": 8
+        },
+        "community/community-lfi-multipart": {
+          "blocked": 2,
+          "sent": 2
+        },
+        "community/community-rce": {
+          "blocked": 2,
+          "sent": 4
+        },
+        "community/community-rce-rawrequests": {
+          "blocked": 3,
+          "sent": 3
+        },
+        "community/community-sqli": {
+          "blocked": 12,
+          "sent": 12
+        },
+        "community/community-user-agent": {
+          "blocked": 6,
+          "sent": 9
+        },
+        "community/community-xss": {
+          "blocked": 98,
+          "sent": 104
+        },
+        "community/community-xxe": {
+          "blocked": 0,
+          "sent": 2
+        },
+        "owasp/crlf": {
+          "blocked": 6,
+          "sent": 7
+        },
+        "owasp/ldap-injection": {
+          "blocked": 2,
+          "sent": 24
+        },
+        "owasp/mail-injection": {
+          "blocked": 3,
+          "sent": 24
+        },
+        "owasp/nosql-injection": {
+          "blocked": 12,
+          "sent": 50
+        },
+        "owasp/path-traversal": {
+          "blocked": 6,
+          "sent": 20
+        },
+        "owasp/rce": {
+          "blocked": 2,
+          "sent": 6
+        },
+        "owasp/rce-urlparam": {
+          "blocked": 3,
+          "sent": 9
+        },
+        "owasp/rce-urlpath": {
+          "blocked": 1,
+          "sent": 3
+        },
+        "owasp/shell-injection": {
+          "blocked": 6,
+          "sent": 32
+        },
+        "owasp/sql-injection": {
+          "blocked": 20,
+          "sent": 48
+        },
+        "owasp/ss-include": {
+          "blocked": 12,
+          "sent": 24
+        },
+        "owasp/sst-injection": {
+          "blocked": 11,
+          "sent": 24
+        },
+        "owasp/xml-injection": {
+          "blocked": 3,
+          "sent": 7
+        },
+        "owasp/xss-scripting": {
+          "blocked": 91,
+          "sent": 224
+        },
+        "owasp-api/non-crud": {
+          "blocked": 2,
+          "sent": 2
+        },
+        "owasp-api/rest": {
+          "blocked": 4,
+          "sent": 7
+        },
+        "owasp-api/soap": {
+          "blocked": 2,
+          "sent": 5
+        }
+      }
+    },
+    "modsec-pl2": {
+      "score": 65.43,
+      "tp_score": 54.67,
+      "tp_blocked": 369,
+      "tp_sent": 675,
+      "tp_unresolved": 0,
+      "tn_score": 64.54,
+      "tn_passed": 91,
+      "tn_sent": 141,
+      "cases": {
+        "community/community-128kb-rce": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-128kb-sqli": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-128kb-xss": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-16kb-rce": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-16kb-sqli": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-16kb-xss": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-32kb-rce": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-32kb-sqli": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-32kb-xss": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-64kb-rce": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-64kb-sqli": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-64kb-xss": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-8kb-rce": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-8kb-sqli": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-8kb-xss": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-lfi": {
+          "blocked": 8,
+          "sent": 8
+        },
+        "community/community-lfi-multipart": {
+          "blocked": 2,
+          "sent": 2
+        },
+        "community/community-rce": {
+          "blocked": 4,
+          "sent": 4
+        },
+        "community/community-rce-rawrequests": {
+          "blocked": 3,
+          "sent": 3
+        },
+        "community/community-sqli": {
+          "blocked": 12,
+          "sent": 12
+        },
+        "community/community-user-agent": {
+          "blocked": 6,
+          "sent": 9
+        },
+        "community/community-xss": {
+          "blocked": 98,
+          "sent": 104
+        },
+        "community/community-xxe": {
+          "blocked": 0,
+          "sent": 2
+        },
+        "owasp/crlf": {
+          "blocked": 6,
+          "sent": 7
+        },
+        "owasp/ldap-injection": {
+          "blocked": 4,
+          "sent": 24
+        },
+        "owasp/mail-injection": {
+          "blocked": 6,
+          "sent": 24
+        },
+        "owasp/nosql-injection": {
+          "blocked": 21,
+          "sent": 50
+        },
+        "owasp/path-traversal": {
+          "blocked": 8,
+          "sent": 20
+        },
+        "owasp/rce": {
+          "blocked": 3,
+          "sent": 6
+        },
+        "owasp/rce-urlparam": {
+          "blocked": 9,
+          "sent": 9
+        },
+        "owasp/rce-urlpath": {
+          "blocked": 2,
+          "sent": 3
+        },
+        "owasp/shell-injection": {
+          "blocked": 10,
+          "sent": 32
+        },
+        "owasp/sql-injection": {
+          "blocked": 20,
+          "sent": 48
+        },
+        "owasp/ss-include": {
+          "blocked": 12,
+          "sent": 24
+        },
+        "owasp/sst-injection": {
+          "blocked": 12,
+          "sent": 24
+        },
+        "owasp/xml-injection": {
+          "blocked": 3,
+          "sent": 7
+        },
+        "owasp/xss-scripting": {
+          "blocked": 95,
+          "sent": 224
+        },
+        "owasp-api/non-crud": {
+          "blocked": 2,
+          "sent": 2
+        },
+        "owasp-api/rest": {
+          "blocked": 5,
+          "sent": 7
+        },
+        "owasp-api/soap": {
+          "blocked": 3,
+          "sent": 5
+        }
+      }
+    },
+    "modsec-strict": {
+      "score": 68.72,
+      "tp_score": 75.41,
+      "tp_blocked": 509,
+      "tp_sent": 675,
+      "tp_unresolved": 0,
+      "tn_score": 0,
+      "tn_passed": 0,
+      "tn_sent": 141,
+      "cases": {
+        "community/community-128kb-rce": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-128kb-sqli": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-128kb-xss": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-16kb-rce": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-16kb-sqli": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-16kb-xss": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-32kb-rce": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-32kb-sqli": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-32kb-xss": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-64kb-rce": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-64kb-sqli": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-64kb-xss": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-8kb-rce": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-8kb-sqli": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-8kb-xss": {
+          "blocked": 1,
+          "sent": 1
+        },
+        "community/community-lfi": {
+          "blocked": 8,
+          "sent": 8
+        },
+        "community/community-lfi-multipart": {
+          "blocked": 2,
+          "sent": 2
+        },
+        "community/community-rce": {
+          "blocked": 4,
+          "sent": 4
+        },
+        "community/community-rce-rawrequests": {
+          "blocked": 3,
+          "sent": 3
+        },
+        "community/community-sqli": {
+          "blocked": 12,
+          "sent": 12
+        },
+        "community/community-user-agent": {
+          "blocked": 6,
+          "sent": 9
+        },
+        "community/community-xss": {
+          "blocked": 104,
+          "sent": 104
+        },
+        "community/community-xxe": {
+          "blocked": 2,
+          "sent": 2
+        },
+        "owasp/crlf": {
+          "blocked": 7,
+          "sent": 7
+        },
+        "owasp/ldap-injection": {
+          "blocked": 18,
+          "sent": 24
+        },
+        "owasp/mail-injection": {
+          "blocked": 15,
+          "sent": 24
+        },
+        "owasp/nosql-injection": {
+          "blocked": 33,
+          "sent": 50
+        },
+        "owasp/path-traversal": {
+          "blocked": 14,
+          "sent": 20
+        },
+        "owasp/rce": {
+          "blocked": 5,
+          "sent": 6
+        },
+        "owasp/rce-urlparam": {
+          "blocked": 9,
+          "sent": 9
+        },
+        "owasp/rce-urlpath": {
+          "blocked": 2,
+          "sent": 3
+        },
+        "owasp/shell-injection": {
+          "blocked": 24,
+          "sent": 32
+        },
+        "owasp/sql-injection": {
+          "blocked": 32,
+          "sent": 48
+        },
+        "owasp/ss-include": {
+          "blocked": 15,
+          "sent": 24
+        },
+        "owasp/sst-injection": {
+          "blocked": 15,
+          "sent": 24
+        },
+        "owasp/xml-injection": {
+          "blocked": 7,
+          "sent": 7
+        },
+        "owasp/xss-scripting": {
+          "blocked": 143,
+          "sent": 224
+        },
+        "owasp-api/non-crud": {
+          "blocked": 2,
+          "sent": 2
+        },
+        "owasp-api/rest": {
+          "blocked": 7,
+          "sent": 7
+        },
+        "owasp-api/soap": {
+          "blocked": 5,
+          "sent": 5
+        }
+      }
+    }
+  }
+}

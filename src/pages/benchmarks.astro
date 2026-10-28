@@ -1,0 +1,292 @@
+---
+// SPDX-FileCopyrightText: 2026 0x00spor3
+// SPDX-License-Identifier: Apache-2.0
+// Every number on this page comes from src/data/benchmark.json, which is the summary.json of one
+// run of the repository's bench/run.sh — copy a new run's file over it to update the page.
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+import { REPO } from "../consts";
+import data from "../data/benchmark.json";
+
+type Run = { rps: number; p50_ms: number; p99_ms: number; p999_ms: number; status_codes: Record<string, number> };
+type Perf = Record<string, Record<string, { fixed: Run; max: Run }> & { memory?: string }>;
+type Gtw = { score: number; tp_score: number; tp_blocked: number; tp_sent: number; tn_score: number; tn_passed: number; tn_sent: number; cases: Record<string, { blocked: number; sent: number }> };
+
+const perf = data.perf as unknown as Perf;
+const gtw = data.gotestwaf as unknown as Record<string, Gtw>;
+const env = data.env as Record<string, string>;
+
+const BENCH = `${REPO}/tree/main/bench`;
+const ORDER = ["direct", "lightwaf", "lightwaf-strict", "modsec-pl1", "modsec-pl2", "modsec-strict"];
+const TARGETS = ORDER.filter((t) => t in perf); // performance runs
+const WAFS = ORDER.filter((t) => t in gtw); // detection runs
+const LABEL: Record<string, string> = {
+  direct: "No WAF",
+  lightwaf: "Light WAF · PL2, threshold 5",
+  "lightwaf-strict": "Light WAF strict · PL4, threshold 3",
+  "modsec-pl1": "ModSecurity + CRS · PL1, threshold 5",
+  "modsec-pl2": "ModSecurity + CRS · PL2, threshold 5",
+  "modsec-strict": "ModSecurity + CRS strict · PL4, threshold 3",
+};
+const isLight = (t: string) => t.startsWith("lightwaf");
+const SCENARIOS = [
+  { id: "clean-get", title: "Clean GET", what: "A browser-like GET with a query string and eight headers, a cookie among them." },
+  { id: "clean-post", title: "Clean POST", what: "The same headers plus a ~400-byte JSON order body." },
+  { id: "attack", title: "Attack", what: "A GET carrying a SQL injection. Every WAF blocks it, so this is the cost of a deny." },
+];
+
+const f1 = (n: number) => n.toFixed(n < 10 ? 2 : 1);
+const int = (n: number) => Math.round(n).toLocaleString("en-US");
+const pct = (n: number) => `${n.toFixed(1)}%`;
+
+const direct = perf.direct;
+const added = (t: string, s: string) => perf[t][s].fixed.p99_ms - direct[s].fixed.p99_ms;
+const rate = Number(env.rate);
+const saturated = (t: string, s: string) => perf[t][s].fixed.rps < 0.95 * rate;
+// A clean request answered with anything but 200 was blocked: that row times a deny.
+const blockedClean = (t: string, s: string) =>
+  s.startsWith("clean") && Object.keys(perf[t][s].fixed.status_codes).some((c) => c !== "200");
+
+// Headline tiles — the clean-GET numbers, Light WAF against the CRS at its default paranoia.
+const ref = "modsec-pl1";
+const tiles = [
+  { v: `+${f1(added("lightwaf", "clean-get"))} ms`, l: "added p99 latency, clean GET" },
+  { v: `${(perf.lightwaf["clean-get"].max.rps / perf[ref]["clean-get"].max.rps).toFixed(1)}×`, l: "the throughput of ModSecurity + CRS on 2 CPUs" },
+  { v: perf.lightwaf.memory ?? "–", l: `memory under load (ModSecurity: ${perf[ref].memory ?? "–"})` },
+  {
+    v: `${pct(gtw["lightwaf-strict"].tp_score)}`,
+    l: `gotestwaf attacks blocked, strict profile (default: ${pct(gtw.lightwaf.tp_score)})`,
+  },
+];
+
+const allCases = [...new Set(WAFS.flatMap((t) => Object.keys(gtw[t].cases)))].sort();
+const shortDigest = (img: string) => {
+  const [name, digest] = img.split(" ");
+  return { name, digest: digest?.replace("sha256:", "").slice(0, 12) };
+};
+const images = Object.entries(env)
+  .filter(([k]) => k.startsWith("image."))
+  .map(([k, v]) => ({ svc: k.slice(6), ...shortDigest(v) }));
+const runDate = env.run_id ? `${env.run_id.slice(0, 4)}-${env.run_id.slice(4, 6)}-${env.run_id.slice(6, 8)}` : "";
+---
+
+<Base
+  title="Benchmarks — Light WAF"
+  description="Reproducible benchmark of Light WAF against no WAF and ModSecurity + OWASP CRS: added latency, throughput, memory, and gotestwaf detection — with the machine, the images and the caveats."
+>
+  <Nav />
+
+  <header class="hero">
+    <div class="wrap">
+      <span class="eyebrow">Benchmarks</span>
+      <h1>What it costs, and <span class="accent">what it catches</span>.</h1>
+      <p class="lede">
+        Light WAF against no WAF and against the reference open-source WAF, ModSecurity v3 with the
+        OWASP Core Rule Set — same machine, same CPUs, pinned images. One script reproduces every number
+        on this page, and the caveats are part of the result.
+      </p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href={BENCH}>Run it yourself</a>
+        <a class="btn btn-ghost" href="#caveats">Read the caveats</a>
+      </div>
+    </div>
+  </header>
+
+  <section id="summary">
+    <div class="wrap">
+      <div class="bench-tiles">
+        {tiles.map((t) => (
+          <div class="perf-stat">
+            <span class="pv">{t.v}</span>
+            <span class="pl">{t.l}</span>
+          </div>
+        ))}
+      </div>
+      <p class="perf-note">
+        Run of <b>{runDate}</b> on an {env.cpu_model}, Docker {env.docker}. Each WAF is pinned to the
+        same <b>2 CPUs</b>; the backend and the load generator run on other cores. Full setup{" "}
+        <a href="#setup">below</a>.
+      </p>
+    </div>
+  </section>
+
+  <section id="overhead">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Overhead</span>
+        <h2>Latency and throughput.</h2>
+        <p>
+          Latency is measured at a fixed {rate} requests per second, a load every target sustains;{" "}
+          <em>added p99</em>{" "}is the target's p99 minus the p99 without a WAF. Throughput is the most the
+          target serves with 64 connections and no rate limit.
+        </p>
+      </div>
+
+      {SCENARIOS.map((s) => {
+        const top = Math.max(...TARGETS.map((t) => perf[t][s.id].max.rps));
+        return (
+          <div class="bench-scenario">
+            <h3>{s.title}</h3>
+            <p class="bench-what">{s.what}</p>
+            <div class="bench-bars" role="img" aria-label={`Maximum requests per second, ${s.title}`}>
+              {TARGETS.map((t) => (
+                <div class="bench-bar" title={`${LABEL[t]}: ${int(perf[t][s.id].max.rps)} req/s`}>
+                  <span class="bb-label">{LABEL[t]}</span>
+                  <span class="bb-track">
+                    <span class:list={["bb-fill", { lw: isLight(t), base: t === "direct" }]} style={`--w:${(perf[t][s.id].max.rps / top) * 100}%`} />
+                  </span>
+                  <span class="bb-value">{int(perf[t][s.id].max.rps)} <small>req/s</small></span>
+                </div>
+              ))}
+            </div>
+            <div class="map">
+              <table>
+                <thead>
+                  <tr><th>Target</th><th>p50</th><th>p99</th><th>p99.9</th><th>added p99</th><th>max req/s</th><th>vs no WAF</th></tr>
+                </thead>
+                <tbody>
+                  {TARGETS.map((t) => {
+                    const r = perf[t][s.id];
+                    return (
+                      <tr>
+                        <td class="area">{LABEL[t]}</td>
+                        <td>{f1(r.fixed.p50_ms)} ms</td>
+                        <td>{f1(r.fixed.p99_ms)} ms</td>
+                        <td>{f1(r.fixed.p999_ms)} ms</td>
+                        <td>{t === "direct" ? "–" : `+${f1(added(t, s.id))} ms`}{t !== "direct" && saturated(t, s.id) ? " (saturated)" : ""}{blockedClean(t, s.id) ? " (blocked the request)" : ""}</td>
+                        <td>{int(r.max.rps)}</td>
+                        <td>{t === "direct" ? "–" : pct((r.max.rps / direct[s.id].max.rps) * 100)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        );
+      })}
+
+      <p class="perf-note">
+        Memory is each WAF container's usage after its load runs:
+        {WAFS.filter((t) => perf[t]?.memory).map((t, i, a) => <span><b>{LABEL[t]}</b> {perf[t].memory}{i < a.length - 1 ? ", " : "."}</span>)}
+      </p>
+    </div>
+  </section>
+
+  <section id="detection">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Detection</span>
+        <h2>Attacks blocked, legitimate traffic let through.</h2>
+        <p>
+          Measured with <a href="https://github.com/wallarm/gotestwaf">gotestwaf</a>: its attack sets
+          (SQLi, XSS, traversal, RCE, SSTI, XXE, LDAP, NoSQL, mail and SSI injection, CRLF, …, each through
+          several encodings and placements) and its set of legitimate requests that look suspicious. A
+          <span class="mono">403</span> or a <span class="mono">400</span> counts as blocked for every WAF.
+        </p>
+      </div>
+      <div class="map">
+        <table>
+          <thead>
+            <tr><th>Target</th><th>Attacks blocked</th><th>Legitimate passed</th><th>gotestwaf score</th></tr>
+          </thead>
+          <tbody>
+            {WAFS.map((t) => (
+              <tr class:list={{ "bench-lw": isLight(t) }}>
+                <td class="area">{LABEL[t]}</td>
+                <td>{pct(gtw[t].tp_score)} <span class="bench-dim">({gtw[t].tp_blocked}/{gtw[t].tp_sent})</span></td>
+                <td>{pct(gtw[t].tn_score)} <span class="bench-dim">({gtw[t].tn_passed}/{gtw[t].tn_sent})</span></td>
+                <td>{pct(gtw[t].score)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="perf-note">
+        gotestwaf's overall score averages application and API security; its GraphQL and gRPC sets are
+        not run here (no such backend), so the API part rests on a handful of REST and SOAP cases.
+      </p>
+
+      <details class="bench-details">
+        <summary>Attacks blocked, per gotestwaf test case</summary>
+        <div class="map">
+          <table>
+            <thead>
+              <tr><th>Test case</th>{WAFS.map((t) => <th>{LABEL[t]}</th>)}</tr>
+            </thead>
+            <tbody>
+              {allCases.map((c) => (
+                <tr>
+                  <td class="area mono">{c}</td>
+                  {WAFS.map((t) => {
+                    const r = gtw[t].cases[c];
+                    return <td>{r ? `${r.blocked}/${r.sent}` : "–"}</td>;
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section id="caveats">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Read this first</span>
+        <h2>What these numbers do and don't say.</h2>
+      </div>
+      <div class="feature-grid">
+        <div class="feature">
+          <h3>Light WAF was tuned on gotestwaf</h3>
+          <p>Its detection modules were developed by running gotestwaf and closing the bypasses it found; the CRS was not. That favours Light WAF by construction — read its gotestwaf score as a regression measure more than an independent ranking. An independent dataset is on the to-do list.</p>
+        </div>
+        <div class="feature">
+          <h3>Paranoia levels don't line up</h3>
+          <p>PL2 in Light WAF is not PL2 in the CRS: the two rule sets grade their rules differently. Several CRS levels are shown, and both WAFs run their documented settings with no rule exclusions.</p>
+        </div>
+        <div class="feature">
+          <h3>Strict trades false positives for coverage</h3>
+          <p>gotestwaf's legitimate set is small (141 requests), so a clean score there is not zero false positives on real traffic. Paranoia 4 with threshold 3 blocks on accumulated weak signals: run it in detection-only mode on your traffic first. The strict CRS, with no exclusions, blocks even the clean benchmark requests, so it appears in the detection results only.</p>
+        </div>
+        <div class="feature">
+          <h3>Requests only</h3>
+          <p>Light WAF does not inspect responses, so ModSecurity's response-body inspection is off. Both keep their shipped logging. Nothing is tuned to win.</p>
+        </div>
+        <div class="feature">
+          <h3>The machine matters</h3>
+          <p>Absolute numbers depend on the CPU, the CPU sets and on Docker running in a VM or natively. Compare targets within one run. This is a WAF's own cost on a loopback network — no TLS, no real application.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="setup">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Setup</span>
+        <h2>The run, exactly.</h2>
+        <p>
+          Reproduce it with <span class="mono">cd bench &amp;&amp; ./run.sh</span> — Docker and bash are the
+          only requirements. The <a href={`${BENCH}#readme`}>methodology</a> describes every step.
+        </p>
+      </div>
+      <div class="map">
+        <table>
+          <tbody>
+            <tr><td class="area">Host</td><td>{env.cpu_model} · {env.host_cpus} CPUs visible to Docker · {env.os} · kernel {env.kernel}</td></tr>
+            <tr><td class="area">CPU sets</td><td>WAF <span class="mono">{env.waf_cpus}</span> · backend <span class="mono">{env.backend_cpus}</span> · load generator <span class="mono">{env.loadgen_cpus}</span></td></tr>
+            <tr><td class="area">Load</td><td>{env.duration} per run after a {env.warmup} warm-up · {env.connections} connections · fixed-rate runs at {rate} req/s with coordinated-omission correction</td></tr>
+            {images.map((i) => (
+              <tr><td class="area">{i.svc}</td><td><span class="mono">{i.name}</span> <span class="bench-dim mono">{i.digest}</span></td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+</Base>

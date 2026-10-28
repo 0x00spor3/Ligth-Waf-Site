@@ -943,6 +943,94 @@ footer {
   }
 }
 
+/* ── Benchmarks page ─────────────────────────────────────────────── */
+.bench-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1rem;
+}
+.bench-tiles .perf-stat .pv {
+  font-size: clamp(2rem, 4vw, 2.7rem);
+}
+.bench-scenario {
+  margin-top: 2.6rem;
+}
+.bench-scenario h3 {
+  font-size: 1.2rem;
+}
+.bench-what {
+  color: var(--ink-dim);
+  margin: 0.3rem 0 1.2rem;
+}
+.bench-bars {
+  display: grid;
+  gap: 0.55rem;
+  margin-bottom: 1.2rem;
+}
+.bench-bar {
+  display: grid;
+  grid-template-columns: minmax(150px, 280px) 1fr 120px;
+  align-items: center;
+  gap: 0.9rem;
+  font-size: 0.88rem;
+}
+.bb-label {
+  color: var(--ink);
+}
+.bb-track {
+  height: 14px;
+  border-radius: 4px;
+  background: var(--surface-2);
+}
+.bb-fill {
+  display: block;
+  height: 100%;
+  width: var(--w);
+  min-width: 3px;
+  border-radius: 0 4px 4px 0;
+  background: var(--ink-faint);
+}
+.bb-fill.base {
+  background: var(--line-2);
+}
+.bb-fill.lw {
+  background: var(--signal);
+}
+.bb-value {
+  font-family: var(--font-mono);
+  color: var(--ink);
+  text-align: right;
+}
+.bb-value small {
+  color: var(--ink-faint);
+}
+.bench-dim {
+  color: var(--ink-faint);
+}
+.map tr.bench-lw td {
+  background: color-mix(in srgb, var(--signal) 5%, transparent);
+}
+.bench-details {
+  margin-top: 1.6rem;
+}
+.bench-details summary {
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--signal);
+  margin-bottom: 1rem;
+}
+@media (max-width: 700px) {
+  .bench-bar {
+    grid-template-columns: 1fr auto;
+    row-gap: 0.3rem;
+  }
+  .bb-track {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}
+
 /* ── Docs layout ─────────────────────────────────────────────────── */
 .docs {
   display: grid;
