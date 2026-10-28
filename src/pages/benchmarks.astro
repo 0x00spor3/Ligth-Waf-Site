@@ -6,7 +6,7 @@
 import Base from "../layouts/Base.astro";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
-import { REPO } from "../consts";
+import { REPO, ISSUES } from "../consts";
 import data from "../data/benchmark.json";
 
 type Run = { rps: number; p50_ms: number; p99_ms: number; p999_ms: number; status_codes: Record<string, number> };
@@ -252,6 +252,10 @@ const runDate = env.run_id ? `${env.run_id.slice(0, 4)}-${env.run_id.slice(4, 6)
           <p>gotestwaf's legitimate set is small (141 requests), so a clean score there is not zero false positives on real traffic. Paranoia 4 with threshold 3 blocks on accumulated weak signals: run it in detection-only mode on your traffic first. The strict CRS, with no exclusions, blocks even the clean benchmark requests, so it appears in the detection results only.</p>
         </div>
         <div class="feature">
+          <h3>One ModSecurity stack</h3>
+          <p>The numbers are those of ModSecurity v3 — libmodsecurity 3.0.17 with the nginx connector 1.0.4 and CRS 4.30.0, from the official <span class="mono">owasp/modsecurity-crs</span> image — not of ModSecurity in general. ModSecurity v2 on Apache, or the CRS on another engine, will perform differently.</p>
+        </div>
+        <div class="feature">
           <h3>Requests only</h3>
           <p>Light WAF does not inspect responses, so ModSecurity's response-body inspection is off. Both keep their shipped logging. Nothing is tuned to win.</p>
         </div>
@@ -259,6 +263,13 @@ const runDate = env.run_id ? `${env.run_id.slice(0, 4)}-${env.run_id.slice(4, 6)
           <h3>The machine matters</h3>
           <p>Absolute numbers depend on the CPU, the CPU sets and on Docker running in a VM or natively. Compare targets within one run. This is a WAF's own cost on a loopback network — no TLS, no real application.</p>
         </div>
+      </div>
+      <div class="callout bench-corrections">
+        <p>
+          <b>Corrections welcome.</b> Maintain one of the compared projects, or think the setup is unfair
+          to it? <a href={ISSUES}>Open an issue</a>: we'll fix the setup, re-run, and say on this page what
+          changed.
+        </p>
       </div>
     </div>
   </section>

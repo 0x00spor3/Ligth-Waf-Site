@@ -175,6 +175,12 @@ a:hover {
 .nav-links a {
   color: var(--ink-dim);
   font-size: 0.92rem;
+  white-space: nowrap;
+}
+@media (max-width: 960px) {
+  .nav-links {
+    gap: 0.95rem;
+  }
 }
 .nav-links a:hover {
   color: var(--ink);
@@ -1009,6 +1015,9 @@ footer {
 }
 .map tr.bench-lw td {
   background: color-mix(in srgb, var(--signal) 5%, transparent);
+}
+.bench-corrections {
+  margin-top: 1.5rem;
 }
 .bench-details {
   margin-top: 1.6rem;
