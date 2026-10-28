@@ -62,9 +62,9 @@ on. Anything not templated goes verbatim into `waf.extraConfig`.
 
 ## Declarative with the operator
 
-Instead of `helm install` per app, apply the CRD once and then a small `WafProxy` per workload. First
-set the image in `deploy/operator/operator.yaml` to `ghcr.io/0x00spor3/waf-operator:1.0.0`, and the
-`spec.image` of each `WafProxy` to `ghcr.io/0x00spor3/waf-enterprise:1.0.0`:
+Instead of `helm install` per app, apply the CRD once and then a small `WafProxy` per workload. The
+manifests already point at the GHCR release images (`waf-operator` for the operator, and
+`waf-enterprise` as the sample's `spec.image`):
 
 ```sh
 kubectl apply -f deploy/operator/crd.yaml

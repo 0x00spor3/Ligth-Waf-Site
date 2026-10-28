@@ -11,6 +11,17 @@ description: "Run the whole Light WAF stack locally — the waf-enterprise proxy
 
 <p class="lede">Get all three services running locally: the WAF proxy with the at-scale components, the control plane with its dashboard, and the node agent. Production hardening (TLS, secrets, systemd or Kubernetes) is layered on in the other chapters.</p>
 
+> **Just want to see it?** The repository's
+> [demo](https://github.com/0x00spor3/Light-WAF/tree/main/demo) runs the whole stack — with demo
+> traffic and attacks already flowing — from the release images, in one command (needs only Docker):
+>
+> ```sh
+> git clone https://github.com/0x00spor3/Light-WAF && cd Light-WAF/demo && docker compose up
+> ```
+>
+> Then open <http://localhost:9600> (`admin` / `lightwaf-demo`). The rest of this page sets the
+> services up one by one, the way you would for a real deployment.
+
 ## Prerequisites
 
 - **Rust** (stable) to build from source — one Cargo workspace, built from the repository root.
@@ -100,7 +111,7 @@ docker run --rm -p 9600:9600 \
   -v "$PWD/controlplane.toml:/etc/waf/controlplane.toml:ro" \
   -e WAF_CP_DATABASE_URL=postgres://postgres:pw@host.docker.internal:5432/postgres \
   -e WAF_CP_API_TOKEN=change-me \
-  ghcr.io/0x00spor3/waf-controlplane:1.0.0
+  ghcr.io/0x00spor3/waf-controlplane:1.0.1
 ```
 
 Open <http://localhost:9600>. With no governance configured you'll be asked for the bearer token
