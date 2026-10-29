@@ -949,6 +949,13 @@ footer {
   }
 }
 
+/* External status badge (Scorecard) under a section */
+.scorecard-badge {
+  display: inline-block;
+  margin-top: 1rem;
+  line-height: 0;
+}
+
 /* ── Benchmarks page ─────────────────────────────────────────────── */
 .bench-tiles {
   display: grid;
