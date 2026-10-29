@@ -111,7 +111,7 @@ docker run --rm -p 9600:9600 \
   -v "$PWD/controlplane.toml:/etc/waf/controlplane.toml:ro" \
   -e WAF_CP_DATABASE_URL=postgres://postgres:pw@host.docker.internal:5432/postgres \
   -e WAF_CP_API_TOKEN=change-me \
-  ghcr.io/0x00spor3/waf-controlplane:1.0.1
+  ghcr.io/0x00spor3/waf-controlplane:1.0.2
 ```
 
 Open <http://localhost:9600>. With no governance configured you'll be asked for the bearer token

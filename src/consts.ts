@@ -3,7 +3,7 @@
 // Shared site constants. Light WAF is one open-source repository (Apache-2.0): the core and the
 // at-scale components live in the same workspace and ship on the same version.
 
-export const VERSION = "1.0.1";
+export const VERSION = "1.0.2";
 
 export const REPO = "https://github.com/0x00spor3/Light-WAF";
 /** A file on the default branch of the repository. */
@@ -18,6 +18,9 @@ export const SECURITY_POLICY = repoFile("SECURITY.md");
 export const LICENSE = repoFile("LICENSE");
 export const ISSUES = `${REPO}/issues`;
 export const SECURITY_ADVISORY = `${REPO}/security/advisories/new`;
+/** OpenSSF Scorecard: the repository's supply-chain grade, and its badge. */
+export const SCORECARD = "https://scorecard.dev/viewer/?uri=github.com/0x00spor3/Light-WAF";
+export const SCORECARD_BADGE = "https://api.scorecard.dev/projects/github.com/0x00spor3/Light-WAF/badge";
 
 /** Container images (GitHub Container Registry), multi-arch (amd64 + arm64). */
 export const IMAGE_REGISTRY = "ghcr.io/0x00spor3";

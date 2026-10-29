@@ -14,6 +14,8 @@ import {
   CHANGELOG,
   RELEASES,
   LICENSE,
+  SCORECARD,
+  SCORECARD_BADGE,
 } from "../consts";
 
 const ways = [
@@ -78,6 +80,14 @@ const ways = [
         <a class="btn btn-primary" href={SECURITY_ADVISORY}>Report a vulnerability</a>
         <a class="btn btn-ghost" href={SECURITY_POLICY}>Security policy</a>
       </div>
+      <p class="perf-note">
+        <b>Supply chain.</b> GitHub Actions pinned to commit SHAs and image bases to digests, kept
+        fresh by Dependabot; CodeQL on every change; every container image gated on a vulnerability
+        scan. The repository's practices are graded continuously by OpenSSF Scorecard.
+      </p>
+      <a class="scorecard-badge" href={SCORECARD}>
+        <img src={SCORECARD_BADGE} alt="OpenSSF Scorecard score for Light WAF" height="20" loading="lazy" />
+      </a>
     </div>
   </section>
 
