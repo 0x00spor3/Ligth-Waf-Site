@@ -3,19 +3,115 @@
 // SPDX-License-Identifier: Apache-2.0
 import BrandMark from "./BrandMark.astro";
 import { REPO } from "../consts";
+
+// Product pages live under one "Product" menu; the rest are top-level. The mobile panel shows
+// the same links grouped, so both layouts come from these lists.
+const PRODUCT = [
+  { href: "/core", label: "Core", note: "The WAF on a single node" },
+  { href: "/scale", label: "At scale", note: "Control plane, cluster, Kubernetes" },
+  { href: "/architecture", label: "Architecture", note: "Crates, seams and boundaries" },
+];
+const LEARN = [
+  { href: "/docs", label: "Docs" },
+  { href: "/benchmarks", label: "Benchmarks" },
+  { href: "/blog", label: "Blog" },
+];
+const PROJECT = [{ href: "/community", label: "Community" }];
+
+// "/docs/quickstart" is inside Docs, "/blog/…" inside Blog.
+const path = Astro.url.pathname.replace(/\/$/, "") || "/";
+const isActive = (href: string) => path === href || path.startsWith(href + "/");
+const productActive = PRODUCT.some((p) => isActive(p.href));
+const current = (href: string) => (isActive(href) ? "page" : undefined);
 ---
 
-<nav class="nav">
+<nav class="nav" aria-label="Main">
   <div class="wrap nav-inner">
     <a class="brand" href="/"><BrandMark /> Light<b>WAF</b></a>
+
     <div class="nav-links">
-      <a href="/core">Core</a>
-      <a href="/scale">At scale</a>
-      <a href="/architecture">Architecture</a>
-      <a href="/benchmarks">Benchmarks</a>
-      <a href="/docs">Docs</a>
-      <a href="/community">Community</a>
+      <details class="nav-drop">
+        <summary class={productActive ? "active" : ""}>
+          Product <span class="caret" aria-hidden="true"></span>
+        </summary>
+        <div class="nav-drop-panel">
+          {
+            PRODUCT.map((p) => (
+              <a href={p.href} aria-current={current(p.href)}>
+                <b>{p.label}</b>
+                <span>{p.note}</span>
+              </a>
+            ))
+          }
+        </div>
+      </details>
+      {
+        [...LEARN, ...PROJECT].map((l) => (
+          <a href={l.href} aria-current={current(l.href)}>
+            {l.label}
+          </a>
+        ))
+      }
       <a class="btn btn-ghost" href={REPO}>GitHub</a>
+    </div>
+
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-panel" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <div class="nav-panel" id="nav-panel" hidden>
+    <div class="wrap">
+      {
+        [
+          { group: "Product", items: PRODUCT },
+          { group: "Learn", items: LEARN },
+          { group: "Project", items: PROJECT },
+        ].map((g) => (
+          <div class="nav-group">
+            <span class="nav-group-label">{g.group}</span>
+            {g.items.map((it) => (
+              <a href={it.href} aria-current={current(it.href)}>
+                {it.label}
+              </a>
+            ))}
+          </div>
+        ))
+      }
+      <a class="btn btn-ghost nav-panel-gh" href={REPO}>GitHub</a>
     </div>
   </div>
 </nav>
+
+<script>
+  const nav = document.querySelector<HTMLElement>(".nav");
+  const toggle = nav?.querySelector<HTMLButtonElement>(".nav-toggle");
+  const panel = nav?.querySelector<HTMLElement>(".nav-panel");
+  const drop = nav?.querySelector<HTMLDetailsElement>(".nav-drop");
+
+  const setOpen = (open: boolean) => {
+    if (!toggle || !panel) return;
+    toggle.setAttribute("aria-expanded", String(open));
+    panel.hidden = !open;
+    nav?.classList.toggle("nav-open", open);
+  };
+  toggle?.addEventListener("click", () => setOpen(toggle.getAttribute("aria-expanded") !== "true"));
+
+  // Close the Product menu on a click outside it, and both menus on Escape.
+  document.addEventListener("click", (e) => {
+    if (drop?.open && !drop.contains(e.target as Node)) drop.open = false;
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    if (drop?.open) {
+      drop.open = false;
+      drop.querySelector("summary")?.focus();
+    }
+    if (toggle?.getAttribute("aria-expanded") === "true") {
+      setOpen(false);
+      toggle.focus();
+    }
+  });
+  // Back to the desktop layout: the mobile panel must not stay open behind it.
+  matchMedia("(min-width: 821px)").addEventListener("change", (e) => e.matches && setOpen(false));
+</script>
