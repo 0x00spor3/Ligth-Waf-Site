@@ -21,6 +21,9 @@ export const SECURITY_ADVISORY = `${REPO}/security/advisories/new`;
 /** OpenSSF Scorecard: the repository's supply-chain grade, and its badge. */
 export const SCORECARD = "https://scorecard.dev/viewer/?uri=github.com/0x00spor3/Light-WAF";
 export const SCORECARD_BADGE = "https://api.scorecard.dev/projects/github.com/0x00spor3/Light-WAF/badge";
+/** OpenSSF Best Practices: the project's self-certification, and its badge. */
+export const BEST_PRACTICES = "https://www.bestpractices.dev/projects/16074";
+export const BEST_PRACTICES_BADGE = `${BEST_PRACTICES}/badge`;
 
 /** Container images (GitHub Container Registry), multi-arch (amd64 + arm64). */
 export const IMAGE_REGISTRY = "ghcr.io/0x00spor3";

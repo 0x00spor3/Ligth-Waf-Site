@@ -949,10 +949,14 @@ footer {
   }
 }
 
-/* External status badge (Scorecard) under a section */
-.scorecard-badge {
-  display: inline-block;
+/* External status badges (Scorecard, Best Practices) under a section */
+.supply-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   margin-top: 1rem;
+}
+.supply-badges a {
   line-height: 0;
 }
 
