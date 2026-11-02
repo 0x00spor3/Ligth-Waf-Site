@@ -1,23 +1,27 @@
 ---
 layout: ../../layouts/BlogLayout.astro
-title: "We attacked our own WAF: 12 bypasses and what fixed them"
-description: "Four pentest rounds against Light WAF with OWASP Juice Shop and DVWA behind it: the payloads that got through, why they got through, how each was fixed, and the gaps that are still open."
-date: "2026-10-30"
+title: "How we test Light WAF's rules: what four pentest rounds got past it"
+description: "Four pentest rounds against Light WAF with OWASP Juice Shop and DVWA behind it: the payloads that got through, why they got through, the tests that keep each one closed, and the gaps that are still open."
+date: "2026-11-02"
 author: "0x00spor3"
 ---
 
 <!-- SPDX-FileCopyrightText: 2026 0x00spor3
      SPDX-License-Identifier: Apache-2.0 -->
 
-# We attacked our own WAF: 12 bypasses and what fixed them
+# How we test Light WAF's rules: what four pentest rounds got past it
 
-<p class="lede">A WAF that has only been tested by the people who wrote its rules has not been tested. Before 1.0 we put
-Light WAF in front of two deliberately vulnerable applications and attacked it for real. This is what got
-through, why, and how each hole was closed — plus the ones that are still open.</p>
+<p class="lede">Before 1.0 we put Light WAF in front of two deliberately vulnerable applications and attacked it
+for real. This is what got through, why, and the tests that now keep each hole closed — plus the ones
+that are still open.</p>
+
+To be clear about what this is: not a third-party audit. The attacks were written by the same people who
+write the rules, so they share our blind spots. That is exactly why we want outside testers; the
+[end of this post](#reporting) says how to tell us about a request that gets through.
 
 > **All the bypasses below were found in the 0.5.x releases and fixed before 1.0.0.** The current release
-> is 1.0.2. New to Light WAF? [Why we built Light WAF](/blog/why-light-waf) explains how it scores and
-> blocks requests, which helps with the details here.
+> is 1.0.2. New to Light WAF? [Following one request through a WAF written in Rust](/blog/why-light-waf)
+> explains how it scores and blocks requests, which helps with the details here.
 
 ## The setup
 
@@ -115,7 +119,7 @@ bypass on another stack — so they count.
 | `{"__proto__":{…}}` | same blind spot: prototype pollution is a key | `proto-pollution-key`, keys only — `obj.__proto__` as a value stays clean |
 | `OR 1 LIKE 1`, `OR 1<2`, `OR 0x1=0x1` | the tautology rule only knew `=` with integers or single characters | comparisons and `LIKE` with numeric operands; `a<b or c>d` in prose stays clean |
 | `*{7*7}`, `@(1+2)`, `{%print(7*7)%}`, `{php}` | Thymeleaf, Razor, Jinja without a space, Smarty | delimiters added to the SSTI rules, plus `ssti-smarty-php` |
-| `${${lower:j}ndi:…}`, `${::-j}${::-n}di` | Log4Shell lookups that rebuild `jndi` at runtime | a curated CRS rule that matches the obfuscation primitives instead of the word |
+| `${${lower:j}ndi:…}`, `${::-j}${::-n}di` | Log4Shell lookups that rebuild `jndi` at runtime | a rule in the optional curated CRS pack (`waf-crs-curated`, off by default) that matches the obfuscation primitives instead of the word |
 
 ## A regex that could never match
 
@@ -168,6 +172,30 @@ Not every finding became a rule:
   positives; the strict profile (paranoia level 4, threshold 3) blocks 96%, also with none. Where you sit between the two is a choice, and the
   [benchmark page](/benchmarks) has the per-category numbers for both, next to ModSecurity + CRS.
 
+## Why not just use the CRS, then?
+
+It is a fair question, because most of the bypasses above are not new. Comments inside SQL, error-based
+functions, Shellshock, operators hidden in JSON keys: the
+[OWASP Core Rule Set](https://coreruleset.org/) has handled these for years. Writing native rules means
+rediscovering that history, and this post is what that cost looks like. We do not know which classics
+we are still missing; the corpus, gotestwaf and rounds like these are how we find them.
+
+What we get in return for that cost:
+
+- **Every rule lands with its false-positive traps.** The corpus keeps each attack next to its benign
+  look-alikes, and the corpus run fails if a rule starts blocking one of them.
+- **Every block explains itself.** About 85 rules, each with an id and a severity that sets its score, so
+  a blocked request lists exactly what fired and why. The rule set is small enough to read in an
+  afternoon.
+- **The fast path is checked, not assumed.** The prefilter that lets clean traffic skip the rules is
+  tested against the full pass, which is how the `UNION/**/SELECT` fix was kept from being skipped in
+  production.
+
+If the CRS's coverage matters more to you than these, ModSecurity or Coraza with the CRS are good
+choices, and the [benchmark page](/benchmarks) compares Light WAF with ModSecurity + CRS at the same
+paranoia level. Light WAF can also load your own SecRule files, and an optional curated CRS pack
+(`waf-crs-curated`, off by default) covers some of the gaps, such as the Log4Shell obfuscation above.
+
 ## What we took away
 
 - **Verify the root cause in the code, not in the report.** Two of the reports' guesses were wrong
@@ -177,6 +205,8 @@ Not every finding became a rule:
   months. Every fix here started from a test that failed first.
 - **Every fix lands with its false-positive traps.** A rule for `exp(~` is worthless if it also
   blocks `exp(2)`. The corpus keeps both, forever.
+
+<h2 id="reporting">Found a way past it?</h2>
 
 If you find a request that gets through, please report it privately through
 [GitHub's vulnerability reporting](https://github.com/0x00spor3/Light-WAF/security/advisories/new) —

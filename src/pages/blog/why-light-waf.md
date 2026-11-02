@@ -303,7 +303,8 @@ infallible, but it keeps memory-safety bugs out of the code that parses hostile 
   cookies, form and JSON bodies, multipart, the GraphQL lexer and the gRPC extractor — run with
   ClusterFuzzLite on every pull request and nightly.
 - **Real attacks**: before 1.0 we put the WAF in front of OWASP Juice Shop and DVWA and attacked it. What
-  got through and how it was fixed is the subject of the next post.
+  got through and how it was fixed is the subject of
+  [the next post](/blog/attacking-our-own-waf).
 
 ## What it costs
 
