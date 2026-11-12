@@ -1,0 +1,37 @@
+---
+// SPDX-FileCopyrightText: 2026 0x00spor3
+// SPDX-License-Identifier: Apache-2.0
+import Base from "../../layouts/Base.astro";
+import Nav from "../../components/Nav.astro";
+import Footer from "../../components/Footer.astro";
+
+type Post = { frontmatter: { title: string; description?: string; date: string }; url: string };
+// A leading underscore keeps a post out of the build (Astro skips `_` files in pages/): a draft.
+const posts = Object.values(import.meta.glob<Post>(["./*.md", "!./_*.md"], { eager: true })).sort((a, b) =>
+  b.frontmatter.date.localeCompare(a.frontmatter.date),
+);
+const fmt = (d: string) =>
+  new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+---
+
+<Base title="Blog — Light WAF" description="Notes from the Light WAF project: why it is built the way it is, how the detection is tested, and what we learn along the way.">
+  <Nav />
+  <div class="wrap blog">
+    <main class="prose">
+      <h1>Blog</h1>
+      <p class="lede">Notes from the project: why it is built the way it is, how the detection is tested, and what we learn along the way.</p>
+      <ul class="post-list">
+        {
+          posts.map((p) => (
+            <li>
+              <a href={p.url}>{p.frontmatter.title}</a>
+              <time datetime={p.frontmatter.date}>{fmt(p.frontmatter.date)}</time>
+              {p.frontmatter.description && <p>{p.frontmatter.description}</p>}
+            </li>
+          ))
+        }
+      </ul>
+    </main>
+  </div>
+  <Footer />
+</Base>

@@ -137,6 +137,20 @@ const secrets = [
     </table>
   </div>
 
+  <h3>Verify an image</h3>
+  <p>
+    Every image is signed with <a href="https://github.com/sigstore/cosign">cosign</a> by the release
+    workflow, keyless: the signature is bound to that workflow's identity and logged in the public
+    Sigstore transparency log, and each image carries a signed SBOM. Check one before you run it:
+  </p>
+  <pre class="code"><span class="p">$</span> cosign verify {IMAGE_REGISTRY}/waf-enterprise:{VERSION} \
+    --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+    --certificate-identity-regexp '^https://github\.com/0x00spor3/Light-WAF/\.github/workflows/images\.yml@refs/(tags/v.+|heads/main)$'</pre>
+  <p>
+    The SBOM attestation, and admission policies that enforce the signature in Kubernetes, are in
+    the <a href={`${repoFile("SECURITY.md")}#verifying-the-container-images`}>security policy</a>.
+  </p>
+
   <p style="margin-top:1.4rem">
     <a href={REPO}>Source on GitHub →</a> · <a href={repoFile("ARCHITECTURE.md")}>Architecture notes →</a> · <a href={`${REPO}/tree/main/scripts`}>Per-feature runbooks →</a>
   </p>

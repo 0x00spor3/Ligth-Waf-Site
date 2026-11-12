@@ -14,6 +14,10 @@ import {
   CHANGELOG,
   RELEASES,
   LICENSE,
+  SCORECARD,
+  SCORECARD_BADGE,
+  BEST_PRACTICES,
+  BEST_PRACTICES_BADGE,
 } from "../consts";
 
 const ways = [
@@ -77,6 +81,21 @@ const ways = [
       <div class="hero-cta">
         <a class="btn btn-primary" href={SECURITY_ADVISORY}>Report a vulnerability</a>
         <a class="btn btn-ghost" href={SECURITY_POLICY}>Security policy</a>
+      </div>
+      <p class="perf-note">
+        <b>Supply chain.</b> GitHub Actions pinned to commit SHAs and image bases to digests, kept
+        fresh by Dependabot; CodeQL and fuzzing on every change; every container image gated on a
+        vulnerability scan and signed with Sigstore, release assets with SLSA provenance. The
+        repository's practices are graded continuously by OpenSSF Scorecard, and the project meets
+        the OpenSSF Best Practices criteria.
+      </p>
+      <div class="supply-badges">
+        <a href={SCORECARD}>
+          <img src={SCORECARD_BADGE} alt="OpenSSF Scorecard score for Light WAF" height="20" loading="lazy" />
+        </a>
+        <a href={BEST_PRACTICES}>
+          <img src={BEST_PRACTICES_BADGE} alt="OpenSSF Best Practices badge for Light WAF" height="20" loading="lazy" />
+        </a>
       </div>
     </div>
   </section>

@@ -35,11 +35,10 @@ routing in the core, which is a deliberate non-goal for now.
 
 ## Install with Helm
 
-The charts live in the repository; install them from a checkout:
+The charts are published as signed OCI artifacts on GHCR, one version per release (Helm 3.8 or
+later):
 
 ```sh
-git clone https://github.com/0x00spor3/Light-WAF && cd Light-WAF
-
 # 1. Control plane (managed Postgres in prod; bundled shown for a quick start):
 helm install waf-cp oci://ghcr.io/0x00spor3/charts/waf-controlplane --version 1.0.3 \
   -n waf --create-namespace \
@@ -51,6 +50,9 @@ helm install myapp-waf oci://ghcr.io/0x00spor3/charts/waf --version 1.0.3 \
   -n prod --create-namespace \
   --set waf.backend=http://myapp.prod.svc.cluster.local:8080
 ```
+
+From a checkout of the repository, `charts/waf-controlplane` and `charts/waf` work in place of the
+`oci://` references; the later examples on this page use them.
 
 Then route external traffic to the WAF `Service` (an Ingress or a Gateway `HTTPRoute` — see
 `deploy/examples/`). The full manual and per-cluster options are in the

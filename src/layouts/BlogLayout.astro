@@ -1,0 +1,29 @@
+---
+// SPDX-FileCopyrightText: 2026 0x00spor3
+// SPDX-License-Identifier: Apache-2.0
+import Base from "./Base.astro";
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+
+interface Props {
+  /** Blog posts are Markdown: title, description and date come from their frontmatter. */
+  frontmatter: { title: string; description?: string; date: string; author?: string };
+}
+const { title, description, date, author } = Astro.props.frontmatter;
+const when = new Date(date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+---
+
+<Base title={`${title} — Light WAF blog`} description={description}>
+  <Nav />
+  <div class="wrap blog">
+    <main>
+      <article class="prose">
+        <p class="post-meta">
+          <a href="/blog">Blog</a> · <time datetime={date}>{when}</time>{author && <> · {author}</>}
+        </p>
+        <slot />
+      </article>
+    </main>
+  </div>
+  <Footer />
+</Base>
