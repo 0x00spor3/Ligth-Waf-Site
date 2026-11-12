@@ -1,7 +1,7 @@
 ---
 layout: ../../layouts/DocsLayout.astro
 title: "Compliance & SIEM"
-description: "Generate signed SOC2/PCI evidence bundles from the Light WAF control plane, and forward decisions, audit records and alerts to a SIEM as at-least-once ECS-like NDJSON."
+description: "Generate signed SOC2/PCI evidence bundles from the Light WAF control plane, and forward decisions, audit records and alerts to a SIEM, at least once, as ECS-like NDJSON or CEF."
 ---
 
 <!-- SPDX-FileCopyrightText: 2026 0x00spor3
@@ -76,7 +76,7 @@ batch_size             = 500
 name        = "splunk"
 endpoint    = "https://splunk:8088/services/collector/event"
 auth_header = "Splunk <hec-token>"    # or env WAF_CP_SIEM_AUTH_SPLUNK
-format      = "ecs"                    # v1: ecs (NDJSON)
+format      = "ecs"                    # ecs (NDJSON, the default) | cef
 streams     = ["decisions", "audit", "alerts"]
 ```
 
@@ -109,5 +109,15 @@ curl "$CP/api/siem/status" -H "Authorization: Bearer $TOKEN"
 Rising lag means the SIEM isn't keeping up (or is rejecting batches — check the last error). Multiple
 destinations each keep their own cursor, so you can fan out to several SIEMs independently.
 
-> Additional output formats (CEF/LEEF/syslog) and vendor adapters are on the roadmap; v1 emits ECS-like
-> NDJSON over generic HTTP, which Splunk HEC and Elastic accept directly.
+### Output formats
+
+`ecs` is NDJSON over generic HTTP, which Splunk HEC and Elastic accept directly.
+
+`cef` emits Common Event Format, also over HTTP. ArcSight, QRadar and Sentinel take CEF over syslog, so
+it needs a collector in between, such as Vector or Logstash, that receives the POST and forwards it as
+syslog. The acknowledgement then comes from the collector, and delivery past it depends on its buffering.
+Dedup on `externalId`, which carries the `event.id`. See the
+[RUNBOOK, §L](https://github.com/0x00spor3/Light-WAF/blob/main/scripts/controlplane/RUNBOOK.md), for a
+tested Vector pipeline and the field mapping.
+
+> LEEF, a native syslog transport and vendor adapters are on the roadmap.

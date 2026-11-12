@@ -20,7 +20,7 @@ write the rules, so they share our blind spots. That is exactly why we want outs
 [end of this post](#reporting) says how to tell us about a request that gets through.
 
 > **All the bypasses below were found in the 0.5.x releases and fixed before 1.0.0.** The current release
-> is 1.0.2. New to Light WAF? [Following one request through a WAF written in Rust](/blog/why-light-waf)
+> is 1.0.3. New to Light WAF? [Following one request through a WAF written in Rust](/blog/why-light-waf)
 > explains how it scores and blocks requests, which helps with the details here.
 
 ## The setup
@@ -163,10 +163,11 @@ Not every finding became a rule:
 
 ## Still open
 
-- **LFI inside multipart form fields.** In the [gotestwaf benchmark](/benchmarks), two
-  `community-lfi-multipart` cases (`/static/img/../../etc/passwd` and a UNC path) pass even on the
-  strict profile, while the same payloads are blocked in a query string. It is
-  [an open issue](https://github.com/0x00spor3/Light-WAF/labels/help%20wanted), and help is welcome.
+> **Update, 1.0.3.** This list used to open with two `community-lfi-multipart` cases that passed even
+> on the strict profile. They were not an LFI gap: malformed multipart framing, or one invalid UTF-8
+> byte, kept the whole body from being inspected. That was fixed in 1.0.3, together with the same
+> gap in form and raw bodies, and both cases are now blocked on both profiles.
+
 - **The default profile is deliberately conservative.** With the benchmark's default profile
   (paranoia level 2, threshold 5) Light WAF blocks 76% of gotestwaf's attack set with no false
   positives; the strict profile (paranoia level 4, threshold 3) blocks 96%, also with none. Where you sit between the two is a choice, and the
