@@ -89,7 +89,7 @@ The auth header is best supplied via `WAF_CP_SIEM_AUTH_<NAME>` (name upper-cased
 |---|---|
 | `decisions` | denied verdicts (with the score breakdown) |
 | `audit` | the signed governance audit records |
-| `alerts` | fired alerts |
+| `alerts` | fired alerts, with up to 5 `request_id`s of the denied events behind each (`waf.alert.sample_request_ids`) and, with `public_url` set, a link to the alert's dashboard page (`event.url`) |
 
 ### Delivery guarantees
 
@@ -116,7 +116,8 @@ destinations each keep their own cursor, so you can fan out to several SIEMs ind
 `cef` emits Common Event Format, also over HTTP. ArcSight, QRadar and Sentinel take CEF over syslog, so
 it needs a collector in between, such as Vector or Logstash, that receives the POST and forwards it as
 syslog. The acknowledgement then comes from the collector, and delivery past it depends on its buffering.
-Dedup on `externalId`, which carries the `event.id`. See the
+Dedup on `externalId`, which carries the `event.id`. On alert events, the sample request ids are in
+`cs2` (`sampleRequestIds`) and the alert link in `cs3` (`alertUrl`). See the
 [RUNBOOK, §L](https://github.com/0x00spor3/Light-WAF/blob/main/scripts/controlplane/RUNBOOK.md), for a
 tested Vector pipeline and the field mapping.
 

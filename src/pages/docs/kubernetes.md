@@ -40,13 +40,13 @@ later):
 
 ```sh
 # 1. Control plane (managed Postgres in prod; bundled shown for a quick start):
-helm install waf-cp oci://ghcr.io/0x00spor3/charts/waf-controlplane --version 1.0.3 \
+helm install waf-cp oci://ghcr.io/0x00spor3/charts/waf-controlplane --version 1.0.4 \
   -n waf --create-namespace \
   --set postgres.bundled.enabled=true \
   --set secrets.apiToken=<ingest-token>
 
 # 2. The WAF in front of your app:
-helm install myapp-waf oci://ghcr.io/0x00spor3/charts/waf --version 1.0.3 \
+helm install myapp-waf oci://ghcr.io/0x00spor3/charts/waf --version 1.0.4 \
   -n prod --create-namespace \
   --set waf.backend=http://myapp.prod.svc.cluster.local:8080
 ```
@@ -66,7 +66,7 @@ on. Anything not templated goes verbatim into `waf.extraConfig`.
 
 Instead of `helm install` per app, apply the CRD once and then a small `WafProxy` per workload. The
 manifests already point at the GHCR release images (`waf-operator` for the operator, and
-`waf-enterprise` as the sample's `spec.image`):
+`waf-enterprise` as the sample's `spec.image`). The operator needs Kubernetes 1.33 or later:
 
 ```sh
 kubectl apply -f deploy/operator/crd.yaml

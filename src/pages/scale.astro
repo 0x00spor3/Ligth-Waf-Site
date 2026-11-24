@@ -23,7 +23,7 @@ const scale = [
 
 const operate = [
   { t: "Full request capture", d: "Optionally capture the complete denied request — headers, cookies and body — off the data path, so the drill-down shows exactly what was blocked. Node-side redaction, short retention, RBAC-gated and audited on every view." },
-  { t: "Attack-signature alerting", d: "Rules over the decision stream fire when a pattern crosses a threshold (a per-IP or per-rule block burst), with cooldowns, and push to a webhook." },
+  { t: "Attack-signature alerting", d: "Rules over the decision stream fire when a pattern crosses a threshold (a per-IP or per-rule block burst), with cooldowns, and push to a webhook. Open an alert to see the denied events that made it fire, and whether it is still ongoing." },
   { t: "Live, no-refresh dashboard", d: "Events and alerts stream in over SSE — the console updates the moment a node reports, without a page reload." },
 ];
 

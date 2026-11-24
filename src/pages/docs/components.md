@@ -116,6 +116,8 @@ v1 handles exact IPs only (CIDRs are skipped with a warning).
 
 Loads curated rule content (CVE/app/evasion signatures: Log4Shell, Spring4Shell, cloud-metadata
 SSRF, webshells, `.git`/`.env` exposure, …) through the core CRS engine. Additive to the same score.
+Since 1.0.4 it also covers the Aug–Nov 2026 KEV wave (Apache Roller XML-RPC, TeamCity XStream,
+Langflow, Ivanti Connect Secure, Cisco SD-WAN Manager, WSO2 JWT `alg:none` and more), 41 rules in all.
 
 ```toml
 [enterprise.crs_curated]

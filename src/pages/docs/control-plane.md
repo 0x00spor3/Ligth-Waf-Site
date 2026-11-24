@@ -26,6 +26,7 @@ scrape_interval_seconds = 15                 # how often to scrape node /metrics
 # database_url = "postgres://…"              # prefer WAF_CP_DATABASE_URL
 # api_token    = "change-me"                 # prefer WAF_CP_API_TOKEN (governance-off bearer)
 # ui_dir       = "…/ui/dist"                 # DEV override; production embeds the UI (leave unset)
+# public_url   = "https://waf-cp.example.com" # the dashboard's external URL: alerts link to {public_url}/alerts/{id}
 
 # Request-capture retention (hard-delete). Independent of — and deliberately SHORTER than —
 # retention_days: captured requests may hold raw secrets, so the reaper prunes them aggressively.
@@ -73,7 +74,7 @@ Manage views behind the bearer token.
   rejected, and a **block rate**), a **Traffic disposition** bar showing how all traffic was disposed,
   a **Denied mix** bar breaking blocked vs rejected, denied events over time, per-node latency
   (p50/p95/p99), and cluster status (which nodes are reporting and when they were last seen).
-- **Events** — search denied requests (filter by `rule_id`, `decision`, `client_ip`), newest first.
+- **Events** — search denied requests (filter by `rule_id`, `decision`, `client_ip` and a time range), newest first.
   Each row shows the time, node, method, path, client IP, verdict, matched rule, and score. Click a row
   to open the **drill-down**.
 - **Event drill-down** — the full verdict for one request. The **Verdict Meter** shows the accumulated
@@ -88,7 +89,11 @@ Manage views behind the bearer token.
   with a **Text / Hex** toggle plus copy and download. If a capture has not arrived yet (it ships a
   moment after the verdict), was dropped under load, or the request was denied before inspection, the
   panel says so — use **Try again** for the timing case.
-- **Alerts** — recently fired alerts (newest first) and the configured alert rules.
+- **Alerts** — recently fired alerts (newest first) and the configured alert rules. Open an alert to
+  see its **evidence**: the denied events that made it fire (its window, its rule's filters and the
+  group that fired), each linking to the drill-down, and whether the alert is **still ongoing** (the
+  same selection over the window ending now, against the threshold). Each alert keeps a snapshot of
+  its rule's match, so its events stay resolvable after the rule is edited.
 
 ### Manage
 
@@ -115,6 +120,11 @@ webhook, and shown in the Alerts view. A cooldown prevents the same `(rule, grou
 `webhook_format` picks the body: `generic` (the default) posts the alert as JSON, `slack` posts the
 `{"text": …}` that Slack and Mattermost incoming webhooks expect. A Slack webhook URL is a credential,
 so prefer the `WAF_CP_ALERT_WEBHOOK` env var to the file.
+
+The `generic` body carries the alert's `id`. With `[controlplane].public_url` set, every alert also
+links to its dashboard page, `{public_url}/alerts/{id}`: a `url` field in the `generic` body, the URL
+at the end of the Slack/Mattermost text, and `event.url` in the SIEM alert event. Webhooks never carry
+the events themselves; follow the link to see them.
 
 ```toml
 [controlplane.alerting]
@@ -147,6 +157,9 @@ read endpoints:
 | `GET /api/decisions/volume` | current per-decision totals |
 | `GET /api/decisions/series?window_seconds=&bucket_seconds=` | denied counts over time (`bucket_seconds` ∈ {60,300,3600}, window ≤ 7d) |
 | `GET /api/latency` | per-node p50/p95/p99 |
-| `GET /api/events?…` | search denied events |
+| `GET /api/events?rule_id=&decision=&client_ip=&since=&until=&limit=` | search denied events (`since`/`until`: inclusive RFC3339 bounds) |
 | `GET /api/events/{request_id}` | full drill-down |
+| `GET /api/alerts?limit=` | recent fired alerts, newest first, each with its `id` |
+| `GET /api/alerts/{id}` | one alert: the match its events are selected with, and `current` (is it still ongoing) |
+| `GET /api/alerts/{id}/events?limit=&offset=` | the denied events behind the alert, plus the `total` |
 | `GET /api/siem/status` | SIEM export cursor / lag / last delivery |
